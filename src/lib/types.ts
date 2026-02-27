@@ -90,9 +90,16 @@ export interface InsurancePolicy {
 export interface Insurance {
   automobile: InsurancePolicy[];
   homeowners: InsurancePolicy[];
-  medical: InsurancePolicy[];
   life: InsurancePolicy[];
+  termLife: InsurancePolicy[];
+  wholeLife: InsurancePolicy[];
+  criticalIllness: InsurancePolicy[];
+  disability: InsurancePolicy[];
+  extendedHealth: InsurancePolicy[];
+  travel: InsurancePolicy[];
   longTermCare: InsurancePolicy[];
+  mortgage: InsurancePolicy[];
+  pet: InsurancePolicy[];
   other: InsurancePolicy[];
 }
 
@@ -106,6 +113,7 @@ export interface IncomeSource {
   paymentDayOfMonth: string;
   policyReferenceNumber: string;
   monthlyPaymentAmount: string;
+  splitWithSpouse: string;
 }
 
 export interface Income {
@@ -137,6 +145,10 @@ export interface ImportantContacts {
   accountantContact: string;
   financialAdvisorName: string;
   financialAdvisorContact: string;
+  serviceCanadaNumber: string;
+  veteransAffairsNumber: string;
+  unionLocal: string;
+  pensionAdministrator: string;
   funeralHome: string;
   funeralPrePaid: string;
   funeralDetails: string;

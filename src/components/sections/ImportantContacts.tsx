@@ -80,6 +80,45 @@ export default function ImportantContacts({
         </div>
       </section>
 
+      {/* Government & Pension */}
+      <section>
+        <h3 className="text-sage-700 mb-4">Government & Pension Contacts</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TextField
+            label="Service Canada Reference #"
+            name="serviceCanadaNumber"
+            value={data.serviceCanadaNumber}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="For CPP, OAS, GIS inquiries"
+          />
+          <TextField
+            label="Veterans Affairs #"
+            name="veteransAffairsNumber"
+            value={data.veteransAffairsNumber}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="If applicable"
+          />
+          <TextField
+            label="Union Local / Contact"
+            name="unionLocal"
+            value={data.unionLocal}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Union name, local number, contact"
+          />
+          <TextField
+            label="Pension Administrator"
+            name="pensionAdministrator"
+            value={data.pensionAdministrator}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Name and contact for employer pension"
+          />
+        </div>
+      </section>
+
       {/* Funeral */}
       <section>
         <h3 className="text-sage-700 mb-4">Funeral Arrangements</h3>

@@ -332,9 +332,16 @@ export function generatePDF(data: ReadyRecordData): void {
   const insuranceCategories = [
     { key: "automobile" as const, label: "Automobile" },
     { key: "homeowners" as const, label: "Homeowner's / Renter's" },
-    { key: "medical" as const, label: "Medical / Extended Health" },
-    { key: "life" as const, label: "Life Insurance" },
+    { key: "life" as const, label: "Life Insurance (General)" },
+    { key: "termLife" as const, label: "Term Life Insurance" },
+    { key: "wholeLife" as const, label: "Whole Life Insurance" },
+    { key: "criticalIllness" as const, label: "Critical Illness Insurance" },
+    { key: "disability" as const, label: "Disability Insurance" },
+    { key: "extendedHealth" as const, label: "Extended Health / Dental" },
+    { key: "travel" as const, label: "Travel Insurance" },
     { key: "longTermCare" as const, label: "Long-Term Care" },
+    { key: "mortgage" as const, label: "Mortgage Insurance (CMHC)" },
+    { key: "pet" as const, label: "Pet Insurance" },
     { key: "other" as const, label: "Other" },
   ];
 
@@ -357,7 +364,8 @@ export function generatePDF(data: ReadyRecordData): void {
       doc.text(label, PAGE_MARGIN, y);
       y += 6;
 
-      const heads = key === "life"
+      const showBeneficiary = ["life", "termLife", "wholeLife", "criticalIllness"].includes(key);
+      const heads = showBeneficiary
         ? [["Provider", "Policy #", "Contact", "Premium", "Beneficiary"]]
         : [["Provider", "Policy #", "Contact", "Premium", "Coverage"]];
 
@@ -370,7 +378,7 @@ export function generatePDF(data: ReadyRecordData): void {
           p.policyNumber,
           p.contactInfo,
           p.premium ? formatCurrency(parseCurrency(p.premium)) : "",
-          key === "life" ? (p.beneficiary || "") : p.coverageDetails,
+          showBeneficiary ? (p.beneficiary || "") : p.coverageDetails,
         ]),
         headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
         bodyStyles: { fontSize: 9 },
@@ -391,7 +399,7 @@ export function generatePDF(data: ReadyRecordData): void {
     autoTable(doc, {
       startY: y,
       margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
-      head: [["Source", "Type", "Payment Day", "Reference #", "Monthly Amount"]],
+      head: [["Source", "Type", "Payment Day", "Reference #", "Monthly", "Split?"]],
       body: data.income.sources.map((s) => [
         s.companyOrSource,
         s.type,
@@ -400,6 +408,7 @@ export function generatePDF(data: ReadyRecordData): void {
         s.monthlyPaymentAmount
           ? formatCurrency(parseCurrency(s.monthlyPaymentAmount))
           : "",
+        s.splitWithSpouse === "yes" ? "Yes" : "",
       ]),
       headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
       bodyStyles: { fontSize: 9 },
@@ -466,14 +475,27 @@ export function generatePDF(data: ReadyRecordData): void {
   y = PAGE_MARGIN;
   sectionHeader("8. Important Contacts & Notes");
 
-  if (ic.lawyerName || ic.lawyerContact) {
+  if (ic.lawyerName || ic.lawyerContact || ic.accountantName || ic.financialAdvisorName) {
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("Legal & Financial", PAGE_MARGIN, y);
     y += 7;
-    labelValue("Lawyer", `${ic.lawyerName} — ${ic.lawyerContact}`);
-    labelValue("Accountant", `${ic.accountantName} — ${ic.accountantContact}`);
-    labelValue("Financial Advisor", `${ic.financialAdvisorName} — ${ic.financialAdvisorContact}`);
+    if (ic.lawyerName || ic.lawyerContact) labelValue("Lawyer", `${ic.lawyerName} — ${ic.lawyerContact}`);
+    if (ic.accountantName || ic.accountantContact) labelValue("Accountant", `${ic.accountantName} — ${ic.accountantContact}`);
+    if (ic.financialAdvisorName || ic.financialAdvisorContact) labelValue("Financial Advisor", `${ic.financialAdvisorName} — ${ic.financialAdvisorContact}`);
+    y += 4;
+  }
+
+  if (ic.serviceCanadaNumber || ic.veteransAffairsNumber || ic.unionLocal || ic.pensionAdministrator) {
+    checkNewPage(30);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Government & Pension", PAGE_MARGIN, y);
+    y += 7;
+    labelValue("Service Canada Ref #", ic.serviceCanadaNumber);
+    labelValue("Veterans Affairs #", ic.veteransAffairsNumber);
+    labelValue("Union Local / Contact", ic.unionLocal);
+    labelValue("Pension Administrator", ic.pensionAdministrator);
     y += 4;
   }
 

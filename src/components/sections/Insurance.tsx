@@ -18,9 +18,16 @@ type InsuranceCategory = keyof InsuranceType;
 const CATEGORIES: { key: InsuranceCategory; label: string; showBeneficiary: boolean }[] = [
   { key: "automobile", label: "Automobile Insurance", showBeneficiary: false },
   { key: "homeowners", label: "Homeowner's / Renter's Insurance", showBeneficiary: false },
-  { key: "medical", label: "Medical / Extended Health", showBeneficiary: false },
-  { key: "life", label: "Life Insurance", showBeneficiary: true },
+  { key: "life", label: "Life Insurance (General)", showBeneficiary: true },
+  { key: "termLife", label: "Term Life Insurance", showBeneficiary: true },
+  { key: "wholeLife", label: "Whole Life Insurance", showBeneficiary: true },
+  { key: "criticalIllness", label: "Critical Illness Insurance", showBeneficiary: true },
+  { key: "disability", label: "Disability Insurance", showBeneficiary: false },
+  { key: "extendedHealth", label: "Extended Health / Dental", showBeneficiary: false },
+  { key: "travel", label: "Travel Insurance", showBeneficiary: false },
   { key: "longTermCare", label: "Long-Term Care Insurance", showBeneficiary: false },
+  { key: "mortgage", label: "Mortgage Insurance (CMHC)", showBeneficiary: false },
+  { key: "pet", label: "Pet Insurance", showBeneficiary: false },
   { key: "other", label: "Other Insurance", showBeneficiary: false },
 ];
 

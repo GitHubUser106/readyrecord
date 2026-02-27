@@ -54,9 +54,16 @@ export function emptyInsurance(): Insurance {
   return {
     automobile: [],
     homeowners: [],
-    medical: [],
     life: [],
+    termLife: [],
+    wholeLife: [],
+    criticalIllness: [],
+    disability: [],
+    extendedHealth: [],
+    travel: [],
     longTermCare: [],
+    mortgage: [],
+    pet: [],
     other: [],
   };
 }
@@ -181,6 +188,10 @@ export function emptyImportantContacts(): ImportantContacts {
     accountantContact: "",
     financialAdvisorName: "",
     financialAdvisorContact: "",
+    serviceCanadaNumber: "",
+    veteransAffairsNumber: "",
+    unionLocal: "",
+    pensionAdministrator: "",
     funeralHome: "",
     funeralPrePaid: "",
     funeralDetails: "",
@@ -214,8 +225,22 @@ export function loadAllData(): ReadyRecordData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyData();
     const parsed = JSON.parse(raw) as ReadyRecordData;
-    // Merge with empty data to fill any missing fields from older saves
-    return { ...emptyData(), ...parsed };
+    const defaults = emptyData();
+    // Deep merge: top-level spread, then merge sub-objects so new fields get defaults
+    const merged = {
+      ...defaults,
+      ...parsed,
+      insurance: { ...defaults.insurance, ...(parsed.insurance || {}) },
+      importantContacts: { ...defaults.importantContacts, ...(parsed.importantContacts || {}) },
+    };
+    // Backfill new fields on existing income sources
+    if (merged.income?.sources) {
+      merged.income.sources = merged.income.sources.map((s) => ({
+        splitWithSpouse: "",
+        ...s,
+      }));
+    }
+    return merged;
   } catch {
     return emptyData();
   }
@@ -262,13 +287,10 @@ export function getSectionCompletion(data: ReadyRecordData): Record<SectionId, n
 
   const realEstateCount = data.realEstate.properties.length;
 
-  const insuranceCount =
-    data.insurance.automobile.length +
-    data.insurance.homeowners.length +
-    data.insurance.medical.length +
-    data.insurance.life.length +
-    data.insurance.longTermCare.length +
-    data.insurance.other.length;
+  const insuranceCount = Object.values(data.insurance).reduce(
+    (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+    0
+  );
 
   const incomeCount = data.income.sources.length;
 

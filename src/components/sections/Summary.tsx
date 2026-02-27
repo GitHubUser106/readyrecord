@@ -40,13 +40,10 @@ export default function Summary({ data }: SummaryProps) {
     data.debts.creditCards.length +
     data.debts.linesOfCredit.length;
 
-  const policyCount =
-    data.insurance.automobile.length +
-    data.insurance.homeowners.length +
-    data.insurance.medical.length +
-    data.insurance.life.length +
-    data.insurance.longTermCare.length +
-    data.insurance.other.length;
+  const policyCount = Object.values(data.insurance).reduce(
+    (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+    0
+  );
 
   return (
     <div className="space-y-8">

@@ -16,13 +16,25 @@ interface IncomeProps {
 
 const INCOME_TYPES = [
   { value: "cpp", label: "CPP (Canada Pension Plan)" },
+  { value: "cpp-disability", label: "CPP Disability Benefit" },
   { value: "oas", label: "OAS (Old Age Security)" },
   { value: "gis", label: "GIS (Guaranteed Income Supplement)" },
-  { value: "pension", label: "Employer Pension" },
+  { value: "allowance", label: "Allowance / Allowance for Survivor" },
+  { value: "dbpp", label: "Employer Pension — DBPP (Defined Benefit)" },
+  { value: "dcpp", label: "Employer Pension — DCPP (Defined Contribution)" },
   { value: "rrif", label: "RRIF Withdrawal" },
-  { value: "investment", label: "Investment Income" },
-  { value: "rental", label: "Rental Income" },
+  { value: "lif", label: "LIF Withdrawal (Locked-In Fund)" },
+  { value: "lrif", label: "LRIF Withdrawal" },
   { value: "annuity", label: "Annuity" },
+  { value: "investment", label: "Investment Income (Dividends, Interest)" },
+  { value: "rental", label: "Rental Income" },
+  { value: "employment", label: "Employment Income" },
+  { value: "self-employment", label: "Self-Employment Income" },
+  { value: "workers-comp", label: "Workers' Compensation (WSIB / WCB)" },
+  { value: "veterans", label: "Veterans Affairs Disability Pension" },
+  { value: "private-disability", label: "Private Disability Insurance" },
+  { value: "trust", label: "Trust Income" },
+  { value: "support", label: "Spousal / Child Support" },
   { value: "other", label: "Other" },
 ];
 
@@ -36,6 +48,7 @@ function newSource(): IncomeSource {
     paymentDayOfMonth: "",
     policyReferenceNumber: "",
     monthlyPaymentAmount: "",
+    splitWithSpouse: "",
   };
 }
 
@@ -154,6 +167,18 @@ export default function Income({ data, onChange }: IncomeProps) {
                   value={source.monthlyPaymentAmount}
                   onChange={(_, v) => update(index, "monthlyPaymentAmount", v)}
                   onBlur={save}
+                />
+                <SelectField
+                  label="Split with Spouse?"
+                  name="splitWithSpouse"
+                  value={source.splitWithSpouse}
+                  onChange={(_, v) => update(index, "splitWithSpouse", v)}
+                  onBlur={save}
+                  options={[
+                    { value: "no", label: "No" },
+                    { value: "yes", label: "Yes — Income is split" },
+                  ]}
+                  placeholder="Select..."
                 />
                 <TextField
                   label="Notes"
