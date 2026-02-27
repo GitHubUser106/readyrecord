@@ -22,6 +22,29 @@ import {
 const PAGE_MARGIN = 20;
 const HEADER_COLOR: [number, number, number] = [85, 122, 91]; // sage-600
 
+/** Format an ISO date string (yyyy-mm-dd) as a readable date */
+function formatDate(isoDate: string): string {
+  if (!isoDate) return "";
+  const parts = isoDate.split("-");
+  if (parts.length !== 3) return isoDate;
+  const date = new Date(
+    parseInt(parts[0]),
+    parseInt(parts[1]) - 1,
+    parseInt(parts[2])
+  );
+  if (isNaN(date.getTime())) return isoDate;
+  return date.toLocaleDateString("en-CA", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/** Check if Important Contacts has any data at all */
+function hasContactsData(ic: ReadyRecordData["importantContacts"]): boolean {
+  return Object.values(ic).some((v) => v.trim() !== "");
+}
+
 export function generatePDF(data: ReadyRecordData): void {
   const doc = new jsPDF("p", "mm", "letter");
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -145,7 +168,7 @@ export function generatePDF(data: ReadyRecordData): void {
   const pi = data.personalInfo;
   labelValue("Full Legal Name", pi.fullLegalName);
   labelValue("Address", pi.address);
-  labelValue("Date of Birth", pi.dateOfBirth);
+  labelValue("Date of Birth", formatDate(pi.dateOfBirth));
   labelValue("Place of Birth", pi.placeOfBirth);
   labelValue("SIN", maskSIN(pi.sin));
   labelValue("Driver's License", pi.driversLicense);
@@ -161,8 +184,8 @@ export function generatePDF(data: ReadyRecordData): void {
     doc.setTextColor(30);
     labelValue("Spouse's Name", pi.spouseName);
     labelValue("Spouse's SIN", maskSIN(pi.spouseSin));
-    labelValue("Date of Marriage", pi.dateOfMarriage);
-    labelValue("Spouse's DOB", pi.spouseDateOfBirth);
+    labelValue("Date of Marriage", formatDate(pi.dateOfMarriage));
+    labelValue("Spouse's DOB", formatDate(pi.spouseDateOfBirth));
   }
 
   // ============ SECTION 2: DEBTS ============
@@ -287,7 +310,7 @@ export function generatePDF(data: ReadyRecordData): void {
       doc.text(`Property ${i + 1}: ${prop.propertyName || "Unnamed"}`, PAGE_MARGIN, y);
       y += 7;
       labelValue("Address", prop.address);
-      labelValue("Purchase Date", prop.purchaseDate);
+      labelValue("Purchase Date", formatDate(prop.purchaseDate));
       labelValue("Real Estate Agent", prop.realEstateAgent);
       labelValue("Mortgage Lender", prop.mortgageLender);
       labelValue("Property Roll #", prop.propertyRollNumber);
@@ -396,8 +419,10 @@ export function generatePDF(data: ReadyRecordData): void {
   }
 
   // ============ SECTION 7: EXPENSES ============
+  // Only include expenses where the user has actually filled in data
+  // (not just pre-populated description templates)
   const filledExpenses = data.expenses.expenses.filter(
-    (e) => e.description || e.companyName || e.monthlyAmount
+    (e) => e.companyName.trim() !== "" || e.monthlyAmount.trim() !== ""
   );
   if (filledExpenses.length > 0) {
     doc.addPage();
@@ -435,11 +460,12 @@ export function generatePDF(data: ReadyRecordData): void {
   }
 
   // ============ SECTION 8: IMPORTANT CONTACTS ============
+  const ic = data.importantContacts;
+  if (hasContactsData(ic)) {
   doc.addPage();
   y = PAGE_MARGIN;
   sectionHeader("8. Important Contacts & Notes");
 
-  const ic = data.importantContacts;
   if (ic.lawyerName || ic.lawyerContact) {
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
@@ -490,6 +516,7 @@ export function generatePDF(data: ReadyRecordData): void {
     );
     doc.text(lines, PAGE_MARGIN, y);
   }
+  } // end hasContactsData
 
   // Add footer to all pages
   const totalPages = doc.getNumberOfPages();
