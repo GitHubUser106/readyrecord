@@ -7,6 +7,7 @@ import {
   formatCurrency,
   totalBankBalances,
   totalRealEstateValue,
+  totalPhysicalAssetsValue,
   totalMortgageBalance,
   totalCreditCardDebt,
   totalLineOfCreditDebt,
@@ -16,6 +17,8 @@ import {
   totalDebts,
   netWorth,
   monthlyNet,
+  totalAutoPaymentExpenses,
+  totalDigitalSubscriptionsCost,
 } from "@/lib/calculations";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, AlertCircle } from "lucide-react";
@@ -34,6 +37,7 @@ export default function Summary({ data }: SummaryProps) {
   const _monthlyIncome = totalMonthlyIncome(data);
   const _monthlyExpenses = totalMonthlyExpenses(data);
   const _monthlyNet = monthlyNet(data);
+  const _autoPaymentCosts = totalAutoPaymentExpenses(data);
 
   const accountCount =
     data.bankAccounts.accounts.length +
@@ -68,7 +72,7 @@ export default function Summary({ data }: SummaryProps) {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {SECTIONS.filter((s) => s.id !== "summary").map((section) => {
+            {SECTIONS.filter((s) => s.id !== "summary" && s.id !== "action-guide").map((section) => {
               const pct = completions[section.id as SectionId];
               const isComplete = pct === 100;
               return (
@@ -110,6 +114,10 @@ export default function Summary({ data }: SummaryProps) {
                   {formatCurrency(_monthlyExpenses)}
                 </span>
               </div>
+              <div className="flex justify-between text-base text-muted-foreground">
+                <span>Digital Subscriptions</span>
+                <span>{formatCurrency(totalDigitalSubscriptionsCost(data))}</span>
+              </div>
               <div className="border-t border-border pt-3 flex justify-between text-xl font-bold">
                 <span>Monthly Net</span>
                 <span className={_monthlyNet >= 0 ? "text-sage-700" : "text-destructive"}>
@@ -134,6 +142,12 @@ export default function Summary({ data }: SummaryProps) {
                 <span>Real Estate Value</span>
                 <span className="font-semibold">
                   {formatCurrency(totalRealEstateValue(data))}
+                </span>
+              </div>
+              <div className="flex justify-between text-lg">
+                <span>Physical Assets</span>
+                <span className="font-semibold">
+                  {formatCurrency(totalPhysicalAssetsValue(data))}
                 </span>
               </div>
               <div className="flex justify-between text-lg">
@@ -173,6 +187,22 @@ export default function Summary({ data }: SummaryProps) {
         </Card>
       </div>
 
+      {/* Monthly Costs to Cancel */}
+      {_autoPaymentCosts > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-sage-700 mb-2">Monthly Costs That Will Need Cancelling</h3>
+            <p className="text-muted-foreground text-base mb-4">
+              Total of pre-authorized expenses and auto-payment digital subscriptions
+              that your family will need to cancel or transfer.
+            </p>
+            <div className="text-2xl font-bold text-destructive">
+              {formatCurrency(_autoPaymentCosts)} / month
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick stats */}
       <Card>
         <CardContent className="pt-6">
@@ -181,7 +211,7 @@ export default function Summary({ data }: SummaryProps) {
             <div className="text-center p-4 bg-muted/30 rounded-lg">
               <div className="text-3xl font-bold text-primary">{accountCount}</div>
               <div className="text-sm text-muted-foreground mt-1">
-                Accounts Documented
+                Financial Accounts
               </div>
             </div>
             <div className="text-center p-4 bg-muted/30 rounded-lg">
@@ -203,6 +233,38 @@ export default function Summary({ data }: SummaryProps) {
                 {data.realEstate.properties.length}
               </div>
               <div className="text-sm text-muted-foreground mt-1">Properties</div>
+            </div>
+            <div className="text-center p-4 bg-muted/30 rounded-lg">
+              <div className="text-3xl font-bold text-primary">
+                {data.physicalAssets.assets.length}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Physical Assets
+              </div>
+            </div>
+            <div className="text-center p-4 bg-muted/30 rounded-lg">
+              <div className="text-3xl font-bold text-primary">
+                {data.businessInterests.businesses.length}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Businesses
+              </div>
+            </div>
+            <div className="text-center p-4 bg-muted/30 rounded-lg">
+              <div className="text-3xl font-bold text-primary">
+                {data.digitalAccounts.accounts.length}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Digital Accounts
+              </div>
+            </div>
+            <div className="text-center p-4 bg-muted/30 rounded-lg">
+              <div className="text-3xl font-bold text-primary">
+                {data.importantContacts.closeFriends.length}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Contacts Listed
+              </div>
             </div>
           </div>
         </CardContent>

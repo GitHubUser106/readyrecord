@@ -6,14 +6,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FormProgress from "@/components/FormProgress";
 import PersonalInfo from "@/components/sections/PersonalInfo";
-import Debts from "@/components/sections/Debts";
-import BankAccounts from "@/components/sections/BankAccounts";
-import RealEstate from "@/components/sections/RealEstate";
-import Insurance from "@/components/sections/Insurance";
-import Income from "@/components/sections/Income";
-import Expenses from "@/components/sections/Expenses";
 import ImportantContacts from "@/components/sections/ImportantContacts";
+import BankAccounts from "@/components/sections/BankAccounts";
+import Income from "@/components/sections/Income";
+import Debts from "@/components/sections/Debts";
+import RealEstate from "@/components/sections/RealEstate";
+import PhysicalAssets from "@/components/sections/PhysicalAssets";
+import BusinessInterests from "@/components/sections/BusinessInterests";
+import Insurance from "@/components/sections/Insurance";
+import Expenses from "@/components/sections/Expenses";
+import DigitalAccounts from "@/components/sections/DigitalAccounts";
 import Summary from "@/components/sections/Summary";
+import ActionGuide from "@/components/sections/ActionGuide";
 import { loadAllData, saveAllData, getSectionCompletion, clearAllData } from "@/lib/storage";
 import { SECTIONS, type ReadyRecordData, type SectionId } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -179,10 +183,12 @@ export default function FormPage() {
                   }
                 />
               )}
-              {section.id === "debts" && (
-                <Debts
-                  data={data.debts}
-                  onChange={(debts) => setData({ ...data, debts })}
+              {section.id === "important-contacts" && (
+                <ImportantContacts
+                  data={data.importantContacts}
+                  onChange={(importantContacts) =>
+                    setData({ ...data, importantContacts })
+                  }
                 />
               )}
               {section.id === "bank-accounts" && (
@@ -193,10 +199,38 @@ export default function FormPage() {
                   }
                 />
               )}
+              {section.id === "income" && (
+                <Income
+                  data={data.income}
+                  onChange={(income) => setData({ ...data, income })}
+                />
+              )}
+              {section.id === "debts" && (
+                <Debts
+                  data={data.debts}
+                  onChange={(debts) => setData({ ...data, debts })}
+                />
+              )}
               {section.id === "real-estate" && (
                 <RealEstate
                   data={data.realEstate}
                   onChange={(realEstate) => setData({ ...data, realEstate })}
+                />
+              )}
+              {section.id === "physical-assets" && (
+                <PhysicalAssets
+                  data={data.physicalAssets}
+                  onChange={(physicalAssets) =>
+                    setData({ ...data, physicalAssets })
+                  }
+                />
+              )}
+              {section.id === "business-interests" && (
+                <BusinessInterests
+                  data={data.businessInterests}
+                  onChange={(businessInterests) =>
+                    setData({ ...data, businessInterests })
+                  }
                 />
               )}
               {section.id === "insurance" && (
@@ -205,27 +239,22 @@ export default function FormPage() {
                   onChange={(insurance) => setData({ ...data, insurance })}
                 />
               )}
-              {section.id === "income" && (
-                <Income
-                  data={data.income}
-                  onChange={(income) => setData({ ...data, income })}
-                />
-              )}
               {section.id === "expenses" && (
                 <Expenses
                   data={data.expenses}
                   onChange={(expenses) => setData({ ...data, expenses })}
                 />
               )}
-              {section.id === "important-contacts" && (
-                <ImportantContacts
-                  data={data.importantContacts}
-                  onChange={(importantContacts) =>
-                    setData({ ...data, importantContacts })
+              {section.id === "digital-accounts" && (
+                <DigitalAccounts
+                  data={data.digitalAccounts}
+                  onChange={(digitalAccounts) =>
+                    setData({ ...data, digitalAccounts })
                   }
                 />
               )}
               {section.id === "summary" && <Summary data={data} />}
+              {section.id === "action-guide" && <ActionGuide data={data} />}
             </div>
 
             {/* Navigation buttons */}

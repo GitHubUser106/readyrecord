@@ -17,7 +17,15 @@ import {
   netWorth,
   monthlyNet,
   parseCurrency,
+  totalPhysicalAssetsValue,
+  totalAutoPaymentExpenses,
 } from "./calculations";
+import {
+  TIMELINE_SECTIONS,
+  TEMPLATE_LETTERS,
+  IMPORTANT_PHONE_NUMBERS,
+  fillTemplate,
+} from "./action-guide-content";
 
 const PAGE_MARGIN = 20;
 const HEADER_COLOR: [number, number, number] = [85, 122, 91]; // sage-600
@@ -66,6 +74,51 @@ const INCOME_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
+const ASSET_CATEGORY_LABELS: Record<string, string> = {
+  vehicle: "Vehicle",
+  "precious-metals": "Precious Metals",
+  "art-collectibles": "Art & Collectibles",
+  "jewelry-watches": "Jewelry & Watches",
+  firearms: "Firearms",
+  electronics: "Electronics & Equipment",
+  "musical-instruments": "Musical Instruments",
+  "furniture-heirlooms": "Furniture & Heirlooms",
+  tools: "Tools & Workshop Equipment",
+  "wine-spirits": "Wine / Spirits Collection",
+  other: "Other Valuables",
+};
+
+const BUSINESS_TYPE_LABELS: Record<string, string> = {
+  "sole-proprietorship": "Sole Proprietorship",
+  partnership: "Partnership",
+  "corporation-federal": "Corporation (Federal)",
+  "corporation-provincial": "Corporation (Provincial)",
+  "numbered-company": "Numbered Company",
+  "non-profit": "Non-Profit / Society",
+  "rental-property-business": "Rental Property Business",
+  "farm-operation": "Farm Operation",
+  other: "Other",
+};
+
+const DIGITAL_CATEGORY_LABELS: Record<string, string> = {
+  email: "Email",
+  "social-media": "Social Media",
+  "banking-financial": "Banking / Financial",
+  streaming: "Streaming",
+  shopping: "Shopping",
+  "cloud-storage": "Cloud Storage",
+  "utility-account": "Utility Account",
+  government: "Government",
+  other: "Other",
+};
+
+const ACTION_NEEDED_LABELS: Record<string, string> = {
+  cancel: "Cancel",
+  transfer: "Transfer",
+  keep: "Keep",
+  memorialize: "Memorialize",
+};
+
 /** Format an ISO date string (yyyy-mm-dd) as a readable date */
 function formatDate(isoDate: string): string {
   if (!isoDate) return "";
@@ -86,7 +139,12 @@ function formatDate(isoDate: string): string {
 
 /** Check if Important Contacts has any data at all */
 function hasContactsData(ic: ReadyRecordData["importantContacts"]): boolean {
-  return Object.values(ic).some((v) => v.trim() !== "");
+  return (
+    Object.entries(ic).some(
+      ([key, val]) =>
+        key !== "closeFriends" && typeof val === "string" && val.trim() !== ""
+    ) || ic.closeFriends.length > 0
+  );
 }
 
 export function generatePDF(data: ReadyRecordData): void {
@@ -182,6 +240,8 @@ export function generatePDF(data: ReadyRecordData): void {
   doc.text("Financial Summary", PAGE_MARGIN, y);
   y += 10;
 
+  const autoPayCosts = totalAutoPaymentExpenses(data);
+
   autoTable(doc, {
     startY: y,
     margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
@@ -194,6 +254,9 @@ export function generatePDF(data: ReadyRecordData): void {
       ["Total Assets", formatCurrency(totalAssets(data))],
       ["Total Debts", formatCurrency(totalDebts(data))],
       ["Estimated Net Worth", formatCurrency(netWorth(data))],
+      ...(autoPayCosts > 0
+        ? [["", ""], ["Monthly Auto-Payment Costs to Cancel", formatCurrency(autoPayCosts)]]
+        : []),
     ],
     headStyles: {
       fillColor: HEADER_COLOR,
@@ -232,11 +295,203 @@ export function generatePDF(data: ReadyRecordData): void {
     labelValue("Spouse's DOB", formatDate(pi.spouseDateOfBirth));
   }
 
-  // ============ SECTION 2: DEBTS ============
+  // ============ SECTION 2: IMPORTANT CONTACTS ============
+  const ic = data.importantContacts;
+  if (hasContactsData(ic)) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("2. Important Contacts & Advisors");
+
+    if (ic.lawyerName || ic.lawyerContact || ic.accountantName || ic.financialAdvisorName) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Legal & Financial", PAGE_MARGIN, y);
+      y += 7;
+      if (ic.lawyerName || ic.lawyerContact) labelValue("Lawyer", `${ic.lawyerName} — ${ic.lawyerContact}`);
+      if (ic.accountantName || ic.accountantContact) labelValue("Accountant", `${ic.accountantName} — ${ic.accountantContact}`);
+      if (ic.financialAdvisorName || ic.financialAdvisorContact) labelValue("Financial Advisor", `${ic.financialAdvisorName} — ${ic.financialAdvisorContact}`);
+      y += 4;
+    }
+
+    if (ic.clergyName || ic.clergyContact) {
+      checkNewPage(20);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Clergy / Spiritual Advisor", PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Name", ic.clergyName);
+      labelValue("Contact", ic.clergyContact);
+      y += 4;
+    }
+
+    if (ic.employerContact || ic.pensionPlanAdministrator || ic.unionRepresentative || ic.veteransAffairsContact) {
+      checkNewPage(30);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Employer & Work", PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Employer Contact", ic.employerContact);
+      labelValue("Pension Plan Admin", ic.pensionPlanAdministrator);
+      labelValue("Union Representative", ic.unionRepresentative);
+      labelValue("Veterans Affairs", ic.veteransAffairsContact);
+      y += 4;
+    }
+
+    if (ic.serviceCanadaNumber || ic.veteransAffairsNumber || ic.unionLocal || ic.pensionAdministrator || ic.craMyAccountSetUp) {
+      checkNewPage(30);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Government & Pension", PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Service Canada Ref #", ic.serviceCanadaNumber);
+      labelValue("Veterans Affairs #", ic.veteransAffairsNumber);
+      labelValue("Union Local / Contact", ic.unionLocal);
+      labelValue("Pension Administrator", ic.pensionAdministrator);
+      labelValue("CRA My Account Set Up", ic.craMyAccountSetUp === "yes" ? "Yes" : ic.craMyAccountSetUp === "no" ? "No" : ic.craMyAccountSetUp);
+      y += 4;
+    }
+
+    if (ic.funeralHome || ic.funeralPrePaid) {
+      checkNewPage(30);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Funeral Arrangements", PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Funeral Home", ic.funeralHome);
+      labelValue("Pre-Paid", ic.funeralPrePaid);
+      labelValue("Details", ic.funeralDetails);
+      y += 4;
+    }
+
+    if (ic.executorOfWill || ic.locationOfWill || ic.poaName || ic.representationAgreement || ic.advancedDirectiveLocation) {
+      checkNewPage(40);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Will, Estate & Legal Documents", PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Executor of Will", ic.executorOfWill);
+      labelValue("Location of Will", ic.locationOfWill);
+      labelValue("Safety Deposit Box", ic.safetyDepositBoxLocation);
+      labelValue("Key Location", ic.safetyDepositBoxKeyLocation);
+      labelValue("Power of Attorney", ic.poaName);
+      labelValue("POA Document Location", ic.poaDocumentLocation);
+      labelValue("Representation Agreement (BC)", ic.representationAgreement);
+      labelValue("Advanced Directive / Living Will", ic.advancedDirectiveLocation);
+      y += 4;
+    }
+
+    if (ic.closeFriends.length > 0) {
+      checkNewPage(25);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Close Friends to Notify", PAGE_MARGIN, y);
+      y += 6;
+
+      autoTable(doc, {
+        startY: y,
+        margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+        head: [["Name", "Phone", "Email"]],
+        body: ic.closeFriends.map((f) => [f.name, f.phone, f.email]),
+        headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+        theme: "grid",
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      y = (doc as any).lastAutoTable.finalY + 8;
+    }
+
+    if (ic.otherNotes) {
+      checkNewPage(20);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Other Notes", PAGE_MARGIN, y);
+      y += 7;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const lines = doc.splitTextToSize(
+        ic.otherNotes,
+        pageWidth - PAGE_MARGIN * 2
+      );
+      doc.text(lines, PAGE_MARGIN, y);
+    }
+  }
+
+  // ============ SECTION 3: BANK ACCOUNTS ============
+  if (data.bankAccounts.accounts.length > 0) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("3. Bank Accounts & Investments");
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+      head: [["Institution", "Type", "Account #", "Rate", "Balance"]],
+      body: data.bankAccounts.accounts.map((a) => [
+        a.institutionName,
+        ACCOUNT_TYPE_LABELS[a.accountType] || a.accountType,
+        a.accountNumber,
+        a.interestRate,
+        a.totalBalance ? formatCurrency(parseCurrency(a.totalBalance)) : "",
+      ]),
+      headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
+      bodyStyles: { fontSize: 9 },
+      theme: "grid",
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 5;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `Total: ${formatCurrency(totalBankBalances(data))}`,
+      pageWidth - PAGE_MARGIN,
+      y,
+      { align: "right" }
+    );
+  }
+
+  // ============ SECTION 4: INCOME ============
+  if (data.income.sources.length > 0) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("4. Income Sources");
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+      head: [["Source", "Type", "Payment Day", "Reference #", "Monthly", "Split?"]],
+      body: data.income.sources.map((s) => [
+        s.companyOrSource,
+        INCOME_TYPE_LABELS[s.type] || s.type,
+        s.paymentDayOfMonth,
+        s.policyReferenceNumber,
+        s.monthlyPaymentAmount
+          ? formatCurrency(parseCurrency(s.monthlyPaymentAmount))
+          : "",
+        s.splitWithSpouse === "yes" ? "Yes" : "",
+      ]),
+      headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
+      bodyStyles: { fontSize: 9 },
+      theme: "grid",
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 5;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `Total Monthly Income: ${formatCurrency(totalMonthlyIncome(data))}`,
+      pageWidth - PAGE_MARGIN,
+      y,
+      { align: "right" }
+    );
+  }
+
+  // ============ SECTION 5: DEBTS ============
   if (data.debts.creditCards.length > 0 || data.debts.linesOfCredit.length > 0) {
     doc.addPage();
     y = PAGE_MARGIN;
-    sectionHeader("2. Debts");
+    sectionHeader("5. Debts");
 
     if (data.debts.creditCards.length > 0) {
       doc.setFontSize(12);
@@ -307,45 +562,11 @@ export function generatePDF(data: ReadyRecordData): void {
     }
   }
 
-  // ============ SECTION 3: BANK ACCOUNTS ============
-  if (data.bankAccounts.accounts.length > 0) {
-    doc.addPage();
-    y = PAGE_MARGIN;
-    sectionHeader("3. Bank Accounts & Investments");
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
-      head: [["Institution", "Type", "Account #", "Rate", "Balance"]],
-      body: data.bankAccounts.accounts.map((a) => [
-        a.institutionName,
-        ACCOUNT_TYPE_LABELS[a.accountType] || a.accountType,
-        a.accountNumber,
-        a.interestRate,
-        a.totalBalance ? formatCurrency(parseCurrency(a.totalBalance)) : "",
-      ]),
-      headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
-      bodyStyles: { fontSize: 9 },
-      theme: "grid",
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    y = (doc as any).lastAutoTable.finalY + 5;
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      `Total: ${formatCurrency(totalBankBalances(data))}`,
-      pageWidth - PAGE_MARGIN,
-      y,
-      { align: "right" }
-    );
-  }
-
-  // ============ SECTION 4: REAL ESTATE ============
+  // ============ SECTION 6: REAL ESTATE ============
   if (data.realEstate.properties.length > 0) {
     doc.addPage();
     y = PAGE_MARGIN;
-    sectionHeader("4. Real Estate");
+    sectionHeader("6. Real Estate");
 
     data.realEstate.properties.forEach((prop, i) => {
       checkNewPage(50);
@@ -372,7 +593,81 @@ export function generatePDF(data: ReadyRecordData): void {
     );
   }
 
-  // ============ SECTION 5: INSURANCE ============
+  // ============ SECTION 7: PHYSICAL ASSETS ============
+  if (data.physicalAssets.assets.length > 0) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("7. Physical Assets & Valuables");
+
+    data.physicalAssets.assets.forEach((asset, i) => {
+      checkNewPage(60);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Item ${i + 1}: ${asset.description || "Unnamed"}`, PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Category", ASSET_CATEGORY_LABELS[asset.category] || asset.category);
+      labelValue("Location", asset.location);
+      labelValue("Approx. Value", asset.approximateValue ? formatCurrency(parseCurrency(asset.approximateValue)) : "");
+      labelValue("Intended Recipient", asset.intendedRecipient);
+      labelValue("Photo Reference", asset.photoReference);
+
+      if (asset.category === "vehicle") {
+        labelValue("Year/Make/Model", asset.vehicleYearMakeModel);
+        labelValue("VIN", asset.vehicleVin);
+        labelValue("License Plate", asset.vehicleLicensePlate);
+        labelValue("Registration Location", asset.vehicleRegistrationLocation);
+        labelValue("Lien Holder", asset.vehicleLienHolder);
+        labelValue("Keys Location", asset.vehicleKeysLocation);
+        labelValue("Registration/Pink Slip", asset.vehicleRegistrationPinkSlipLocation);
+      }
+      if (asset.category === "firearms") {
+        labelValue("PAL/RPAL License #", asset.firearmsPalRpalNumber);
+      }
+      labelValue("Notes", asset.notes);
+      y += 4;
+    });
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `Total Physical Assets Value: ${formatCurrency(totalPhysicalAssetsValue(data))}`,
+      pageWidth - PAGE_MARGIN,
+      y,
+      { align: "right" }
+    );
+  }
+
+  // ============ SECTION 8: BUSINESS INTERESTS ============
+  if (data.businessInterests.businesses.length > 0) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("8. Business Interests");
+
+    data.businessInterests.businesses.forEach((biz, i) => {
+      checkNewPage(80);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Business ${i + 1}: ${biz.businessName || "Unnamed"}`, PAGE_MARGIN, y);
+      y += 7;
+      labelValue("Business Type", BUSINESS_TYPE_LABELS[biz.businessType] || biz.businessType);
+      labelValue("Your Role", biz.yourRole);
+      labelValue("Ownership %", biz.ownershipPercentage);
+      labelValue("BN / GST #", biz.bnGstNumber);
+      labelValue("Corporation #", biz.corporationNumber);
+      labelValue("Partner(s)", biz.partners);
+      labelValue("Accountant", biz.accountant);
+      labelValue("Lawyer", biz.lawyer);
+      labelValue("Bank Account", biz.bankAccount);
+      labelValue("Corporate Records", biz.corporateRecordsLocation);
+      labelValue("Buy-Sell Agreement", biz.buySellAgreement);
+      labelValue("Shareholder Agreement", biz.shareholderAgreement);
+      labelValue("Key Employees", biz.keyEmployees);
+      labelValue("Notes", biz.notes);
+      y += 4;
+    });
+  }
+
+  // ============ SECTION 9: INSURANCE ============
   const insuranceCategories = [
     { key: "automobile" as const, label: "Automobile" },
     { key: "homeowners" as const, label: "Homeowner's / Renter's" },
@@ -396,7 +691,7 @@ export function generatePDF(data: ReadyRecordData): void {
   if (hasInsurance) {
     doc.addPage();
     y = PAGE_MARGIN;
-    sectionHeader("5. Insurance Plans");
+    sectionHeader("9. Insurance Plans");
 
     insuranceCategories.forEach(({ key, label }) => {
       const policies = data.insurance[key];
@@ -434,53 +729,14 @@ export function generatePDF(data: ReadyRecordData): void {
     });
   }
 
-  // ============ SECTION 6: INCOME ============
-  if (data.income.sources.length > 0) {
-    doc.addPage();
-    y = PAGE_MARGIN;
-    sectionHeader("6. Income Sources");
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
-      head: [["Source", "Type", "Payment Day", "Reference #", "Monthly", "Split?"]],
-      body: data.income.sources.map((s) => [
-        s.companyOrSource,
-        INCOME_TYPE_LABELS[s.type] || s.type,
-        s.paymentDayOfMonth,
-        s.policyReferenceNumber,
-        s.monthlyPaymentAmount
-          ? formatCurrency(parseCurrency(s.monthlyPaymentAmount))
-          : "",
-        s.splitWithSpouse === "yes" ? "Yes" : "",
-      ]),
-      headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
-      bodyStyles: { fontSize: 9 },
-      theme: "grid",
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    y = (doc as any).lastAutoTable.finalY + 5;
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      `Total Monthly Income: ${formatCurrency(totalMonthlyIncome(data))}`,
-      pageWidth - PAGE_MARGIN,
-      y,
-      { align: "right" }
-    );
-  }
-
-  // ============ SECTION 7: EXPENSES ============
-  // Only include expenses where the user has actually filled in data
-  // (not just pre-populated description templates)
+  // ============ SECTION 10: EXPENSES ============
   const filledExpenses = data.expenses.expenses.filter(
     (e) => e.companyName.trim() !== "" || e.monthlyAmount.trim() !== ""
   );
   if (filledExpenses.length > 0) {
     doc.addPage();
     y = PAGE_MARGIN;
-    sectionHeader("7. Monthly Expenses & Bills");
+    sectionHeader("10. Monthly Expenses & Bills");
 
     autoTable(doc, {
       startY: y,
@@ -512,77 +768,149 @@ export function generatePDF(data: ReadyRecordData): void {
     );
   }
 
-  // ============ SECTION 8: IMPORTANT CONTACTS ============
-  const ic = data.importantContacts;
-  if (hasContactsData(ic)) {
+  // ============ SECTION 11: DIGITAL ACCOUNTS ============
+  if (data.digitalAccounts.accounts.length > 0) {
+    doc.addPage();
+    y = PAGE_MARGIN;
+    sectionHeader("11. Digital Accounts & Subscriptions");
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+      head: [["Service", "Category", "Username / Email", "Auto-Pay?", "Monthly Cost", "Action"]],
+      body: data.digitalAccounts.accounts.map((a) => [
+        a.serviceName,
+        DIGITAL_CATEGORY_LABELS[a.category] || a.category,
+        a.usernameEmail,
+        a.autoPayment === "yes" ? "Yes" : a.autoPayment === "no" ? "No" : "",
+        a.monthlyCost ? formatCurrency(parseCurrency(a.monthlyCost)) : "",
+        ACTION_NEEDED_LABELS[a.actionNeeded] || a.actionNeeded,
+      ]),
+      headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
+      bodyStyles: { fontSize: 9 },
+      theme: "grid",
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 5;
+
+    const digitalTotal = data.digitalAccounts.accounts.reduce(
+      (sum, a) => sum + parseCurrency(a.monthlyCost),
+      0
+    );
+    if (digitalTotal > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        `Total Monthly Subscriptions: ${formatCurrency(digitalTotal)}`,
+        pageWidth - PAGE_MARGIN,
+        y,
+        { align: "right" }
+      );
+    }
+  }
+
+  // ============ SECTION 12: ACTION GUIDE ============
   doc.addPage();
   y = PAGE_MARGIN;
-  sectionHeader("8. Important Contacts & Notes");
+  sectionHeader("12. What To Do — Action Guide");
 
-  if (ic.lawyerName || ic.lawyerContact || ic.accountantName || ic.financialAdvisorName) {
-    doc.setFontSize(12);
+  // Intro text
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "italic");
+  const introLines = doc.splitTextToSize(
+    "This guide is for the person who receives this document. Take it one step at a time — there is no rush to do everything at once.",
+    pageWidth - PAGE_MARGIN * 2
+  );
+  doc.text(introLines, PAGE_MARGIN, y);
+  y += introLines.length * 5 + 6;
+
+  // Timeline sections
+  TIMELINE_SECTIONS.forEach((section) => {
+    checkNewPage(25);
+    doc.setFontSize(13);
+    doc.setTextColor(...HEADER_COLOR);
     doc.setFont("helvetica", "bold");
-    doc.text("Legal & Financial", PAGE_MARGIN, y);
-    y += 7;
-    if (ic.lawyerName || ic.lawyerContact) labelValue("Lawyer", `${ic.lawyerName} — ${ic.lawyerContact}`);
-    if (ic.accountantName || ic.accountantContact) labelValue("Accountant", `${ic.accountantName} — ${ic.accountantContact}`);
-    if (ic.financialAdvisorName || ic.financialAdvisorContact) labelValue("Financial Advisor", `${ic.financialAdvisorName} — ${ic.financialAdvisorContact}`);
-    y += 4;
-  }
+    doc.text(section.title, PAGE_MARGIN, y);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(120);
+    doc.text(section.timeframe, pageWidth - PAGE_MARGIN, y, { align: "right" });
+    y += 8;
+    doc.setTextColor(30);
 
-  if (ic.serviceCanadaNumber || ic.veteransAffairsNumber || ic.unionLocal || ic.pensionAdministrator) {
+    section.items.forEach((item) => {
+      checkNewPage(18);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      // Checkbox square
+      doc.setDrawColor(150);
+      doc.setLineWidth(0.3);
+      doc.rect(PAGE_MARGIN, y - 3.5, 4, 4);
+      doc.text(item.title, PAGE_MARGIN + 7, y);
+      y += 5;
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      const descLines = doc.splitTextToSize(
+        item.description,
+        pageWidth - PAGE_MARGIN * 2 - 7
+      );
+      doc.text(descLines, PAGE_MARGIN + 7, y);
+      y += descLines.length * 4 + 4;
+    });
+    y += 4;
+  });
+
+  // Template letters
+  checkNewPage(20);
+  doc.setFontSize(14);
+  doc.setTextColor(...HEADER_COLOR);
+  doc.setFont("helvetica", "bold");
+  doc.text("Template Letters", PAGE_MARGIN, y);
+  y += 3;
+  doc.setDrawColor(...HEADER_COLOR);
+  doc.setLineWidth(0.3);
+  doc.line(PAGE_MARGIN, y, pageWidth - PAGE_MARGIN, y);
+  y += 8;
+  doc.setTextColor(30);
+
+  TEMPLATE_LETTERS.forEach((letter) => {
     checkNewPage(30);
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.text("Government & Pension", PAGE_MARGIN, y);
-    y += 7;
-    labelValue("Service Canada Ref #", ic.serviceCanadaNumber);
-    labelValue("Veterans Affairs #", ic.veteransAffairsNumber);
-    labelValue("Union Local / Contact", ic.unionLocal);
-    labelValue("Pension Administrator", ic.pensionAdministrator);
-    y += 4;
-  }
-
-  if (ic.funeralHome || ic.funeralPrePaid) {
-    checkNewPage(30);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Funeral Arrangements", PAGE_MARGIN, y);
-    y += 7;
-    labelValue("Funeral Home", ic.funeralHome);
-    labelValue("Pre-Paid", ic.funeralPrePaid);
-    labelValue("Details", ic.funeralDetails);
-    y += 4;
-  }
-
-  if (ic.executorOfWill || ic.locationOfWill) {
-    checkNewPage(30);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Will & Estate", PAGE_MARGIN, y);
-    y += 7;
-    labelValue("Executor of Will", ic.executorOfWill);
-    labelValue("Location of Will", ic.locationOfWill);
-    labelValue("Safety Deposit Box", ic.safetyDepositBoxLocation);
-    labelValue("Key Location", ic.safetyDepositBoxKeyLocation);
-    y += 4;
-  }
-
-  if (ic.otherNotes) {
-    checkNewPage(20);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Other Notes", PAGE_MARGIN, y);
-    y += 7;
-    doc.setFontSize(10);
+    doc.text(letter.title, PAGE_MARGIN, y);
+    y += 6;
+    doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    const lines = doc.splitTextToSize(
-      ic.otherNotes,
-      pageWidth - PAGE_MARGIN * 2
+    const filled = fillTemplate(letter.body, data);
+    const letterLines = doc.splitTextToSize(
+      filled,
+      pageWidth - PAGE_MARGIN * 2 - 4
     );
-    doc.text(lines, PAGE_MARGIN, y);
-  }
-  } // end hasContactsData
+    // Draw a light background box
+    doc.setFillColor(248, 248, 246);
+    doc.rect(PAGE_MARGIN, y - 3, pageWidth - PAGE_MARGIN * 2, letterLines.length * 4 + 6, "F");
+    doc.text(letterLines, PAGE_MARGIN + 2, y);
+    y += letterLines.length * 4 + 10;
+  });
+
+  // Phone numbers
+  checkNewPage(30);
+  doc.setFontSize(14);
+  doc.setTextColor(...HEADER_COLOR);
+  doc.setFont("helvetica", "bold");
+  doc.text("Important Canadian Phone Numbers", PAGE_MARGIN, y);
+  y += 8;
+
+  autoTable(doc, {
+    startY: y,
+    margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
+    head: [["Organization", "Phone Number", "Notes"]],
+    body: IMPORTANT_PHONE_NUMBERS.map((p) => [p.name, p.number, p.notes]),
+    headStyles: { fillColor: HEADER_COLOR, fontSize: 9 },
+    bodyStyles: { fontSize: 9 },
+    theme: "grid",
+  });
 
   // Add footer to all pages
   const totalPages = doc.getNumberOfPages();

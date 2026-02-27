@@ -16,6 +16,12 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-4">
           <Link
+            href="/action-guide"
+            className="text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+          >
+            Action Guide
+          </Link>
+          <Link
             href="/about"
             className="text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
           >

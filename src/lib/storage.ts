@@ -4,9 +4,12 @@ import type {
   Debts,
   BankAccounts,
   RealEstate,
+  PhysicalAssets,
+  BusinessInterests,
   Insurance,
   Income,
   Expenses,
+  DigitalAccounts,
   ImportantContacts,
   SectionId,
 } from "./types";
@@ -47,6 +50,18 @@ export function emptyBankAccounts(): BankAccounts {
 export function emptyRealEstate(): RealEstate {
   return {
     properties: [],
+  };
+}
+
+export function emptyPhysicalAssets(): PhysicalAssets {
+  return {
+    assets: [],
+  };
+}
+
+export function emptyBusinessInterests(): BusinessInterests {
+  return {
+    businesses: [],
   };
 }
 
@@ -180,6 +195,12 @@ export function defaultExpenses(): Expenses {
   };
 }
 
+export function emptyDigitalAccounts(): DigitalAccounts {
+  return {
+    accounts: [],
+  };
+}
+
 export function emptyImportantContacts(): ImportantContacts {
   return {
     lawyerName: "",
@@ -200,6 +221,18 @@ export function emptyImportantContacts(): ImportantContacts {
     safetyDepositBoxLocation: "",
     safetyDepositBoxKeyLocation: "",
     otherNotes: "",
+    clergyName: "",
+    clergyContact: "",
+    closeFriends: [],
+    employerContact: "",
+    pensionPlanAdministrator: "",
+    unionRepresentative: "",
+    veteransAffairsContact: "",
+    craMyAccountSetUp: "",
+    poaName: "",
+    poaDocumentLocation: "",
+    representationAgreement: "",
+    advancedDirectiveLocation: "",
   };
 }
 
@@ -213,6 +246,9 @@ function emptyData(): ReadyRecordData {
     income: emptyIncome(),
     expenses: defaultExpenses(),
     importantContacts: emptyImportantContacts(),
+    physicalAssets: emptyPhysicalAssets(),
+    businessInterests: emptyBusinessInterests(),
+    digitalAccounts: emptyDigitalAccounts(),
     lastUpdated: new Date().toISOString(),
   };
 }
@@ -231,7 +267,11 @@ export function loadAllData(): ReadyRecordData {
       ...defaults,
       ...parsed,
       insurance: { ...defaults.insurance, ...(parsed.insurance || {}) },
-      importantContacts: { ...defaults.importantContacts, ...(parsed.importantContacts || {}) },
+      importantContacts: {
+        ...defaults.importantContacts,
+        ...(parsed.importantContacts || {}),
+        closeFriends: parsed.importantContacts?.closeFriends ?? [],
+      },
     };
     // Backfill new fields on existing income sources
     if (merged.income?.sources) {
@@ -287,6 +327,10 @@ export function getSectionCompletion(data: ReadyRecordData): Record<SectionId, n
 
   const realEstateCount = data.realEstate.properties.length;
 
+  const physicalAssetsCount = data.physicalAssets.assets.length;
+
+  const businessCount = data.businessInterests.businesses.length;
+
   const insuranceCount = Object.values(data.insurance).reduce(
     (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
     0
@@ -298,29 +342,41 @@ export function getSectionCompletion(data: ReadyRecordData): Record<SectionId, n
     (e) => e.companyName.trim() !== "" || e.monthlyAmount.trim() !== ""
   ).length;
 
+  const digitalCount = data.digitalAccounts.accounts.length;
+
+  // Important Contacts: count filled flat string fields (skip closeFriends array)
   const contacts = data.importantContacts;
-  const contactFields = Object.values(contacts).filter(
-    (v) => v.trim() !== ""
-  ).length;
-  const contactTotal = Object.keys(contacts).length;
+  const contactStringFields = Object.entries(contacts)
+    .filter(([key, val]) => key !== "closeFriends" && typeof val === "string")
+    .filter(([, val]) => (val as string).trim() !== "").length;
+  const contactStringTotal = Object.entries(contacts)
+    .filter(([key, val]) => key !== "closeFriends" && typeof val === "string").length;
+  const friendBonus = contacts.closeFriends.length > 0 ? 1 : 0;
+  const contactFilled = contactStringFields + friendBonus;
+  const contactTotal = contactStringTotal + 1; // +1 for the closeFriends "section"
 
   return {
     "personal-info": personalTotal > 0 ? Math.round((personalFields / personalTotal) * 100) : 0,
-    debts: debtsCount > 0 ? 100 : 0,
-    "bank-accounts": bankCount > 0 ? 100 : 0,
-    "real-estate": realEstateCount > 0 ? 100 : 0,
-    insurance: insuranceCount > 0 ? 100 : 0,
-    income: incomeCount > 0 ? 100 : 0,
-    expenses: expensesFilled > 0 ? 100 : 0,
     "important-contacts":
-      contactTotal > 0 ? Math.round((contactFields / contactTotal) * 100) : 0,
+      contactTotal > 0 ? Math.round((contactFilled / contactTotal) * 100) : 0,
+    "bank-accounts": bankCount > 0 ? 100 : 0,
+    income: incomeCount > 0 ? 100 : 0,
+    debts: debtsCount > 0 ? 100 : 0,
+    "real-estate": realEstateCount > 0 ? 100 : 0,
+    "physical-assets": physicalAssetsCount > 0 ? 100 : 0,
+    "business-interests": businessCount > 0 ? 100 : 0,
+    insurance: insuranceCount > 0 ? 100 : 0,
+    expenses: expensesFilled > 0 ? 100 : 0,
+    "digital-accounts": digitalCount > 0 ? 100 : 0,
     summary: 0, // summary is always derived
+    "action-guide": 100, // reference content, always complete
   };
 }
 
 export function getOverallCompletion(data: ReadyRecordData): number {
   const completions = getSectionCompletion(data);
-  const sections = Object.keys(completions).filter((k) => k !== "summary") as SectionId[];
+  const excludeKeys = new Set(["summary", "action-guide"]);
+  const sections = Object.keys(completions).filter((k) => !excludeKeys.has(k)) as SectionId[];
   const total = sections.reduce((sum, key) => sum + completions[key], 0);
   return Math.round(total / sections.length);
 }

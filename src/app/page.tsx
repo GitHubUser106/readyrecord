@@ -27,7 +27,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <p className="mt-4 text-base text-muted-foreground">
-              Free. Private. Takes about 30 minutes.
+              Free. Private. Takes about 45 minutes.
             </p>
           </div>
         </section>
@@ -55,7 +55,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="mb-2 text-foreground">Fill in the Sections</h3>
                 <p className="text-muted-foreground text-base">
-                  Work through 8 simple sections at your own pace. Everything
+                  Work through 12 guided sections at your own pace. Everything
                   saves automatically as you go.
                 </p>
               </div>
@@ -147,15 +147,17 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 "Personal identification & SIN numbers",
-                "Credit cards & lines of credit",
+                "Important contacts & close friends",
                 "Bank accounts & investments",
-                "Real estate & mortgages",
-                "Insurance policies (auto, home, life, health)",
                 "Pensions & income sources (CPP, OAS)",
+                "Credit cards & lines of credit",
+                "Real estate & mortgages",
+                "Physical assets & valuables",
+                "Business interests & partnerships",
+                "Insurance policies (auto, home, life, health)",
                 "Monthly bills & expenses",
-                "Lawyer, accountant & important contacts",
-                "Will location & executor details",
-                "Funeral wishes & arrangements",
+                "Digital accounts & subscriptions",
+                "Step-by-step action guide for your family",
               ].map((item) => (
                 <div
                   key={item}
@@ -176,7 +178,7 @@ export default function LandingPage() {
         <section className="py-16 px-4">
           <div className="mx-auto max-w-2xl text-center">
             <Clock className="h-12 w-12 text-sage-500 mx-auto mb-4" aria-hidden="true" />
-            <h2 className="mb-4 text-foreground">About 30 Minutes</h2>
+            <h2 className="mb-4 text-foreground">About 45 Minutes</h2>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
               Grab a cup of tea, your wallet, and a recent bank statement.
               That&apos;s all you need. You can save your progress and come

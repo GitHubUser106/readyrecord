@@ -112,8 +112,32 @@ export function totalMonthlyExpenses(data: ReadyRecordData): number {
   );
 }
 
+export function totalPhysicalAssetsValue(data: ReadyRecordData): number {
+  return data.physicalAssets.assets.reduce(
+    (sum, asset) => sum + parseCurrency(asset.approximateValue),
+    0
+  );
+}
+
+export function totalDigitalSubscriptionsCost(data: ReadyRecordData): number {
+  return data.digitalAccounts.accounts.reduce(
+    (sum, acct) => sum + parseCurrency(acct.monthlyCost),
+    0
+  );
+}
+
+export function totalAutoPaymentExpenses(data: ReadyRecordData): number {
+  const expenseAutoPayments = data.expenses.expenses
+    .filter((e) => e.paymentType === "pre-authorized")
+    .reduce((sum, e) => sum + parseCurrency(e.monthlyAmount), 0);
+  const digitalAutoPayments = data.digitalAccounts.accounts
+    .filter((a) => a.autoPayment === "yes")
+    .reduce((sum, a) => sum + parseCurrency(a.monthlyCost), 0);
+  return expenseAutoPayments + digitalAutoPayments;
+}
+
 export function totalAssets(data: ReadyRecordData): number {
-  return totalBankBalances(data) + totalRealEstateValue(data);
+  return totalBankBalances(data) + totalRealEstateValue(data) + totalPhysicalAssetsValue(data);
 }
 
 export function totalDebts(data: ReadyRecordData): number {

@@ -18,7 +18,7 @@ export interface PersonalInformation {
   spouseDateOfBirth: string;
 }
 
-// --- Section 2: Debts ---
+// --- Debts ---
 export interface CreditCard {
   id: string;
   issuer: string;
@@ -42,7 +42,7 @@ export interface Debts {
   linesOfCredit: LineOfCredit[];
 }
 
-// --- Section 3: Bank Accounts & Investments ---
+// --- Bank Accounts & Investments ---
 export interface BankAccount {
   id: string;
   institutionName: string;
@@ -59,7 +59,7 @@ export interface BankAccounts {
   accounts: BankAccount[];
 }
 
-// --- Section 4: Real Estate ---
+// --- Real Estate ---
 export interface RealEstateProperty {
   id: string;
   propertyName: string;
@@ -76,7 +76,57 @@ export interface RealEstate {
   properties: RealEstateProperty[];
 }
 
-// --- Section 5: Insurance Plans ---
+// --- Physical Assets & Valuables ---
+export interface PhysicalAsset {
+  id: string;
+  description: string;
+  category: string;
+  location: string;
+  approximateValue: string;
+  intendedRecipient: string;
+  notes: string;
+  photoReference: string;
+  // Vehicle-specific fields (when category = "vehicle")
+  vehicleYearMakeModel: string;
+  vehicleVin: string;
+  vehicleLicensePlate: string;
+  vehicleRegistrationLocation: string;
+  vehicleLienHolder: string;
+  vehicleKeysLocation: string;
+  vehicleRegistrationPinkSlipLocation: string;
+  // Firearms-specific (when category = "firearms")
+  firearmsPalRpalNumber: string;
+}
+
+export interface PhysicalAssets {
+  assets: PhysicalAsset[];
+}
+
+// --- Business Interests ---
+export interface BusinessInterest {
+  id: string;
+  businessName: string;
+  businessType: string;
+  yourRole: string;
+  ownershipPercentage: string;
+  bnGstNumber: string;
+  corporationNumber: string;
+  partners: string;
+  accountant: string;
+  lawyer: string;
+  bankAccount: string;
+  corporateRecordsLocation: string;
+  buySellAgreement: string;
+  shareholderAgreement: string;
+  keyEmployees: string;
+  notes: string;
+}
+
+export interface BusinessInterests {
+  businesses: BusinessInterest[];
+}
+
+// --- Insurance Plans ---
 export interface InsurancePolicy {
   id: string;
   provider: string;
@@ -103,7 +153,7 @@ export interface Insurance {
   other: InsurancePolicy[];
 }
 
-// --- Section 6: Income Sources ---
+// --- Income Sources ---
 export interface IncomeSource {
   id: string;
   companyOrSource: string;
@@ -120,7 +170,7 @@ export interface Income {
   sources: IncomeSource[];
 }
 
-// --- Section 7: Monthly Expenses & Bills ---
+// --- Monthly Expenses & Bills ---
 export interface MonthlyExpense {
   id: string;
   companyName: string;
@@ -137,7 +187,31 @@ export interface Expenses {
   expenses: MonthlyExpense[];
 }
 
-// --- Section 8: Important Contacts & Notes ---
+// --- Digital Accounts & Subscriptions ---
+export interface DigitalAccount {
+  id: string;
+  serviceName: string;
+  category: string;
+  usernameEmail: string;
+  passwordHint: string;
+  autoPayment: string;
+  monthlyCost: string;
+  actionNeeded: string;
+  notes: string;
+}
+
+export interface DigitalAccounts {
+  accounts: DigitalAccount[];
+}
+
+// --- Important Contacts & Notes ---
+export interface CloseFriend {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+}
+
 export interface ImportantContacts {
   lawyerName: string;
   lawyerContact: string;
@@ -157,6 +231,19 @@ export interface ImportantContacts {
   safetyDepositBoxLocation: string;
   safetyDepositBoxKeyLocation: string;
   otherNotes: string;
+  // New fields
+  clergyName: string;
+  clergyContact: string;
+  closeFriends: CloseFriend[];
+  employerContact: string;
+  pensionPlanAdministrator: string;
+  unionRepresentative: string;
+  veteransAffairsContact: string;
+  craMyAccountSetUp: string;
+  poaName: string;
+  poaDocumentLocation: string;
+  representationAgreement: string;
+  advancedDirectiveLocation: string;
 }
 
 // --- Master form data ---
@@ -169,6 +256,9 @@ export interface ReadyRecordData {
   income: Income;
   expenses: Expenses;
   importantContacts: ImportantContacts;
+  physicalAssets: PhysicalAssets;
+  businessInterests: BusinessInterests;
+  digitalAccounts: DigitalAccounts;
   lastUpdated: string;
 }
 
@@ -182,14 +272,18 @@ export interface SectionMeta {
 
 export type SectionId =
   | "personal-info"
-  | "debts"
-  | "bank-accounts"
-  | "real-estate"
-  | "insurance"
-  | "income"
-  | "expenses"
   | "important-contacts"
-  | "summary";
+  | "bank-accounts"
+  | "income"
+  | "debts"
+  | "real-estate"
+  | "physical-assets"
+  | "business-interests"
+  | "insurance"
+  | "expenses"
+  | "digital-accounts"
+  | "summary"
+  | "action-guide";
 
 export const SECTIONS: SectionMeta[] = [
   {
@@ -200,11 +294,11 @@ export const SECTIONS: SectionMeta[] = [
     icon: "User",
   },
   {
-    id: "debts",
-    title: "Debts",
+    id: "important-contacts",
+    title: "Important Contacts & Advisors",
     description:
-      "Credit cards, lines of credit — anything your family should know about. No judgement here.",
-    icon: "CreditCard",
+      "Your lawyer, accountant, family contacts, and important details your family will need first.",
+    icon: "BookOpen",
   },
   {
     id: "bank-accounts",
@@ -214,11 +308,39 @@ export const SECTIONS: SectionMeta[] = [
     icon: "Landmark",
   },
   {
+    id: "income",
+    title: "Income Sources",
+    description:
+      "Pensions, CPP, OAS, rental income — everything that comes in each month.",
+    icon: "DollarSign",
+  },
+  {
+    id: "debts",
+    title: "Debts",
+    description:
+      "Credit cards, lines of credit — anything your family should know about. No judgement here.",
+    icon: "CreditCard",
+  },
+  {
     id: "real-estate",
     title: "Real Estate",
     description:
       "Any properties you own — your home, cottage, rental properties. Gather your mortgage papers if you can.",
     icon: "Home",
+  },
+  {
+    id: "physical-assets",
+    title: "Physical Assets & Valuables",
+    description:
+      "Vehicles, jewelry, collectibles, firearms — anything of value your family should know about.",
+    icon: "Package",
+  },
+  {
+    id: "business-interests",
+    title: "Business Interests",
+    description:
+      "Any businesses you own or have a stake in — corporations, partnerships, or sole proprietorships.",
+    icon: "Briefcase",
   },
   {
     id: "insurance",
@@ -228,13 +350,6 @@ export const SECTIONS: SectionMeta[] = [
     icon: "Shield",
   },
   {
-    id: "income",
-    title: "Income Sources",
-    description:
-      "Pensions, CPP, OAS, rental income — everything that comes in each month.",
-    icon: "DollarSign",
-  },
-  {
     id: "expenses",
     title: "Monthly Expenses & Bills",
     description:
@@ -242,11 +357,11 @@ export const SECTIONS: SectionMeta[] = [
     icon: "Receipt",
   },
   {
-    id: "important-contacts",
-    title: "Important Contacts & Notes",
+    id: "digital-accounts",
+    title: "Digital Accounts & Subscriptions",
     description:
-      "Your lawyer, accountant, and any other important details your family should have.",
-    icon: "BookOpen",
+      "Email, social media, streaming, online banking — accounts your family may need to manage.",
+    icon: "Globe",
   },
   {
     id: "summary",
@@ -254,5 +369,12 @@ export const SECTIONS: SectionMeta[] = [
     description:
       "A complete overview of everything you've entered. You're almost done!",
     icon: "BarChart3",
+  },
+  {
+    id: "action-guide",
+    title: "What To Do — Action Guide",
+    description:
+      "A step-by-step guide for your family, with timelines, template letters, and important phone numbers.",
+    icon: "ClipboardList",
   },
 ];

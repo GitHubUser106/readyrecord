@@ -48,7 +48,7 @@ export default function FormProgress({
       </div>
 
       {/* Desktop: vertical sidebar list */}
-      <div className="hidden md:block">
+      <div className="hidden md:block max-h-[calc(100vh-12rem)] overflow-y-auto">
         <ol className="space-y-1">
           {SECTIONS.map((section, index) => {
             const isComplete = completions[section.id] === 100;
