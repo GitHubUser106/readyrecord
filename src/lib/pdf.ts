@@ -22,6 +22,50 @@ import {
 const PAGE_MARGIN = 20;
 const HEADER_COLOR: [number, number, number] = [85, 122, 91]; // sage-600
 
+/** Map dropdown values to readable labels for PDF output */
+const ACCOUNT_TYPE_LABELS: Record<string, string> = {
+  chequing: "Chequing",
+  savings: "Savings",
+  rrsp: "RRSP",
+  "spousal-rrsp": "Spousal RRSP",
+  tfsa: "TFSA",
+  rrif: "RRIF",
+  "spousal-rrif": "Spousal RRIF",
+  lif: "LIF",
+  lrif: "LRIF",
+  lira: "LIRA",
+  gic: "GIC",
+  "mutual-fund": "Mutual Fund",
+  stocks: "Stocks / Brokerage",
+  resp: "RESP",
+  rdsp: "RDSP",
+  other: "Other",
+};
+
+const INCOME_TYPE_LABELS: Record<string, string> = {
+  cpp: "CPP",
+  "cpp-disability": "CPP Disability",
+  oas: "OAS",
+  gis: "GIS",
+  allowance: "Allowance / Survivor",
+  dbpp: "Employer Pension (DBPP)",
+  dcpp: "Employer Pension (DCPP)",
+  rrif: "RRIF Withdrawal",
+  lif: "LIF Withdrawal",
+  lrif: "LRIF Withdrawal",
+  annuity: "Annuity",
+  investment: "Investment Income",
+  rental: "Rental Income",
+  employment: "Employment",
+  "self-employment": "Self-Employment",
+  "workers-comp": "Workers' Comp (WSIB/WCB)",
+  veterans: "Veterans Affairs",
+  "private-disability": "Private Disability",
+  trust: "Trust Income",
+  support: "Spousal/Child Support",
+  other: "Other",
+};
+
 /** Format an ISO date string (yyyy-mm-dd) as a readable date */
 function formatDate(isoDate: string): string {
   if (!isoDate) return "";
@@ -275,7 +319,7 @@ export function generatePDF(data: ReadyRecordData): void {
       head: [["Institution", "Type", "Account #", "Rate", "Balance"]],
       body: data.bankAccounts.accounts.map((a) => [
         a.institutionName,
-        a.accountType,
+        ACCOUNT_TYPE_LABELS[a.accountType] || a.accountType,
         a.accountNumber,
         a.interestRate,
         a.totalBalance ? formatCurrency(parseCurrency(a.totalBalance)) : "",
@@ -402,7 +446,7 @@ export function generatePDF(data: ReadyRecordData): void {
       head: [["Source", "Type", "Payment Day", "Reference #", "Monthly", "Split?"]],
       body: data.income.sources.map((s) => [
         s.companyOrSource,
-        s.type,
+        INCOME_TYPE_LABELS[s.type] || s.type,
         s.paymentDayOfMonth,
         s.policyReferenceNumber,
         s.monthlyPaymentAmount

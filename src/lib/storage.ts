@@ -236,8 +236,8 @@ export function loadAllData(): ReadyRecordData {
     // Backfill new fields on existing income sources
     if (merged.income?.sources) {
       merged.income.sources = merged.income.sources.map((s) => ({
-        splitWithSpouse: "",
         ...s,
+        splitWithSpouse: s.splitWithSpouse ?? "",
       }));
     }
     return merged;
