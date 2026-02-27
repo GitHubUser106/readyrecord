@@ -369,13 +369,12 @@ export function getSectionCompletion(data: ReadyRecordData): Record<SectionId, n
     expenses: expensesFilled > 0 ? 100 : 0,
     "digital-accounts": digitalCount > 0 ? 100 : 0,
     summary: 0, // summary is always derived
-    "action-guide": 100, // reference content, always complete
   };
 }
 
 export function getOverallCompletion(data: ReadyRecordData): number {
   const completions = getSectionCompletion(data);
-  const excludeKeys = new Set(["summary", "action-guide"]);
+  const excludeKeys = new Set(["summary"]);
   const sections = Object.keys(completions).filter((k) => !excludeKeys.has(k)) as SectionId[];
   const total = sections.reduce((sum, key) => sum + completions[key], 0);
   return Math.round(total / sections.length);

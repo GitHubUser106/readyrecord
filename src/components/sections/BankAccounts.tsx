@@ -91,13 +91,13 @@ export default function BankAccounts({ data, onChange }: BankAccountsProps) {
           className="gap-2"
         >
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Account
+          + Add another account
         </Button>
       </div>
 
       {data.accounts.length === 0 && (
-        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-          No accounts added yet. Click &ldquo;Add Account&rdquo; to get started.
+        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+          No accounts here yet &mdash; that&apos;s okay! Add one when you&apos;re ready.
         </p>
       )}
 
@@ -123,7 +123,7 @@ export default function BankAccounts({ data, onChange }: BankAccountsProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Bank / Institution"
+                  label="Which bank or institution?"
                   name="institutionName"
                   value={account.institutionName}
                   onChange={(_, v) =>
@@ -133,7 +133,7 @@ export default function BankAccounts({ data, onChange }: BankAccountsProps) {
                   placeholder="e.g., TD Bank, RBC, Wealthsimple"
                 />
                 <SelectField
-                  label="Account Type"
+                  label="What kind of account?"
                   name="accountType"
                   value={account.accountType}
                   onChange={(_, v) => updateAccount(index, "accountType", v)}
@@ -142,7 +142,7 @@ export default function BankAccounts({ data, onChange }: BankAccountsProps) {
                   placeholder="Select account type"
                 />
                 <TextField
-                  label="Phone Number"
+                  label="Their phone number"
                   name="phoneNumber"
                   value={account.phoneNumber}
                   onChange={(_, v) => updateAccount(index, "phoneNumber", v)}
@@ -188,7 +188,7 @@ export default function BankAccounts({ data, onChange }: BankAccountsProps) {
                   onBlur={save}
                 />
                 <CurrencyField
-                  label="Total Balance"
+                  label="Roughly how much is in it?"
                   name="totalBalance"
                   value={account.totalBalance}
                   onChange={(_, v) =>

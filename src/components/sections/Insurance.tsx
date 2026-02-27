@@ -73,13 +73,13 @@ function InsuranceCategorySection({
           className="gap-2"
         >
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Policy
+          + Add another policy
         </Button>
       </div>
 
       {policies.length === 0 && (
         <p className="text-muted-foreground text-center py-6 bg-muted/30 rounded-lg text-base">
-          No policies added. Click &ldquo;Add Policy&rdquo; if you have {label.toLowerCase()}.
+          No policies here yet &mdash; add one if you have {label.toLowerCase()}.
         </p>
       )}
 
@@ -104,7 +104,7 @@ function InsuranceCategorySection({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Provider"
+                  label="Who's the insurance with?"
                   name="provider"
                   value={policy.provider}
                   onChange={(_, v) => onUpdate(category, index, "provider", v)}
@@ -127,7 +127,7 @@ function InsuranceCategorySection({
                   placeholder="Phone or email"
                 />
                 <CurrencyField
-                  label="Premium"
+                  label="How much is the premium?"
                   name="premium"
                   value={policy.premium}
                   onChange={(_, v) => onUpdate(category, index, "premium", v)}

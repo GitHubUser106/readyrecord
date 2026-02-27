@@ -88,10 +88,10 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sage-700">Digital Accounts & Subscriptions</h3>
+        <h3 className="text-sage-700">Your Online Accounts</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Account
+          + Add another account
         </Button>
       </div>
 
@@ -107,8 +107,7 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
 
       {data.accounts.length === 0 && (
         <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
-          No accounts listed. Click &ldquo;Add Account&rdquo; to document email, social media,
-          streaming, and other digital accounts.
+          No accounts here yet &mdash; add email, social media, streaming, or other online accounts when you&apos;re ready.
         </p>
       )}
 
@@ -132,7 +131,7 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Service / Website Name"
+                  label="What's the service?"
                   name="serviceName"
                   value={acct.serviceName}
                   onChange={(_, v) => update(index, "serviceName", v)}
@@ -149,7 +148,7 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
                   placeholder="Select category..."
                 />
                 <TextField
-                  label="Username / Email Used"
+                  label="Your login email or username"
                   name="usernameEmail"
                   value={acct.usernameEmail}
                   onChange={(_, v) => update(index, "usernameEmail", v)}
@@ -157,7 +156,7 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
                   placeholder="The login email or username"
                 />
                 <TextField
-                  label="Password Hint"
+                  label="Password hint (NOT the password!)"
                   name="passwordHint"
                   value={acct.passwordHint}
                   onChange={(_, v) => update(index, "passwordHint", v)}
@@ -174,14 +173,14 @@ export default function DigitalAccounts({ data, onChange }: DigitalAccountsProps
                   placeholder="Select..."
                 />
                 <CurrencyField
-                  label="Monthly Cost"
+                  label="How much per month?"
                   name="monthlyCost"
                   value={acct.monthlyCost}
                   onChange={(_, v) => update(index, "monthlyCost", v)}
                   onBlur={save}
                 />
                 <SelectField
-                  label="Action Needed"
+                  label="What should your family do with this?"
                   name="actionNeeded"
                   value={acct.actionNeeded}
                   onChange={(_, v) => update(index, "actionNeeded", v)}

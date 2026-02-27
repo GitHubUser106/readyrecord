@@ -27,7 +27,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <TextField
-          label="Full Legal Name"
+          label="What's your full legal name?"
           name="fullLegalName"
           value={data.fullLegalName}
           onChange={handleChange}
@@ -36,7 +36,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
           className="md:col-span-2"
         />
         <TextField
-          label="Address"
+          label="Where do you live?"
           name="address"
           value={data.address}
           onChange={handleChange}
@@ -45,7 +45,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
           className="md:col-span-2"
         />
         <TextField
-          label="Date of Birth"
+          label="When were you born?"
           name="dateOfBirth"
           value={data.dateOfBirth}
           onChange={handleChange}
@@ -53,7 +53,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
           type="date"
         />
         <TextField
-          label="Place of Birth"
+          label="Where were you born?"
           name="placeOfBirth"
           value={data.placeOfBirth}
           onChange={handleChange}
@@ -61,7 +61,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
           placeholder="e.g., Vancouver, BC"
         />
         <TextField
-          label="Social Insurance Number (SIN)"
+          label="What's your SIN?"
           name="sin"
           value={data.sin}
           onChange={handleChange}
@@ -69,14 +69,14 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
           placeholder="XXX-XXX-XXX"
         />
         <TextField
-          label="Driver's License Number"
+          label="Driver's license number"
           name="driversLicense"
           value={data.driversLicense}
           onChange={handleChange}
           onBlur={handleBlur}
         />
         <TextField
-          label="Mother's Maiden Name"
+          label="Mother's maiden name"
           name="mothersMaidenName"
           value={data.mothersMaidenName}
           onChange={handleChange}
@@ -85,10 +85,10 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
       </div>
 
       <div className="border-t border-border pt-6 mt-8">
-        <h3 className="mb-4 text-sage-700">Spouse / Partner</h3>
+        <h3 className="mb-4 text-sage-700">Your Spouse or Partner</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextField
-            label="Spouse's Name"
+            label="Their full name"
             name="spouseName"
             value={data.spouseName}
             onChange={handleChange}
@@ -96,7 +96,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
             className="md:col-span-2"
           />
           <TextField
-            label="Spouse's SIN"
+            label="Their SIN"
             name="spouseSin"
             value={data.spouseSin}
             onChange={handleChange}
@@ -104,7 +104,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
             placeholder="XXX-XXX-XXX"
           />
           <TextField
-            label="Date of Marriage"
+            label="When did you get married?"
             name="dateOfMarriage"
             value={data.dateOfMarriage}
             onChange={handleChange}
@@ -112,7 +112,7 @@ export default function PersonalInfo({ data, onChange }: PersonalInfoProps) {
             type="date"
           />
           <TextField
-            label="Spouse's Date of Birth"
+            label="Their date of birth"
             name="spouseDateOfBirth"
             value={data.spouseDateOfBirth}
             onChange={handleChange}

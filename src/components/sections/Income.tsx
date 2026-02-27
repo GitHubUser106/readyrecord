@@ -91,14 +91,13 @@ export default function Income({ data, onChange }: IncomeProps) {
         <h3 className="text-sage-700">Income Sources</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Income Source
+          + Add another income source
         </Button>
       </div>
 
       {data.sources.length === 0 && (
-        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-          No income sources added yet. Click &ldquo;Add Income Source&rdquo; to
-          get started.
+        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+          No income sources yet &mdash; add your pensions, CPP, OAS, or any other income here.
         </p>
       )}
 
@@ -123,7 +122,7 @@ export default function Income({ data, onChange }: IncomeProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Company / Source"
+                  label="Where does it come from?"
                   name="companyOrSource"
                   value={source.companyOrSource}
                   onChange={(_, v) => update(index, "companyOrSource", v)}
@@ -131,7 +130,7 @@ export default function Income({ data, onChange }: IncomeProps) {
                   placeholder="e.g., Service Canada, Sun Life"
                 />
                 <SelectField
-                  label="Income Type"
+                  label="What kind of income?"
                   name="type"
                   value={source.type}
                   onChange={(_, v) => update(index, "type", v)}
@@ -147,7 +146,7 @@ export default function Income({ data, onChange }: IncomeProps) {
                   onBlur={save}
                 />
                 <TextField
-                  label="Payment Day of Month"
+                  label="What day does it arrive?"
                   name="paymentDayOfMonth"
                   value={source.paymentDayOfMonth}
                   onChange={(_, v) => update(index, "paymentDayOfMonth", v)}
@@ -162,7 +161,7 @@ export default function Income({ data, onChange }: IncomeProps) {
                   onBlur={save}
                 />
                 <CurrencyField
-                  label="Monthly Payment Amount"
+                  label="How much per month?"
                   name="monthlyPaymentAmount"
                   value={source.monthlyPaymentAmount}
                   onChange={(_, v) => update(index, "monthlyPaymentAmount", v)}

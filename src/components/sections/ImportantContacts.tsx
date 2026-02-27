@@ -67,17 +67,17 @@ export default function ImportantContacts({
     <div className="space-y-8">
       {/* Legal & Financial */}
       <section>
-        <h3 className="text-sage-700 mb-4">Legal & Financial Contacts</h3>
+        <h3 className="text-sage-700 mb-4">Your Legal & Financial People</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextField
-            label="Lawyer's Name"
+            label="Your lawyer's name"
             name="lawyerName"
             value={data.lawyerName}
             onChange={handleChange}
             onBlur={handleBlur}
           />
           <TextField
-            label="Lawyer's Contact"
+            label="Their contact info"
             name="lawyerContact"
             value={data.lawyerContact}
             onChange={handleChange}
@@ -85,14 +85,14 @@ export default function ImportantContacts({
             placeholder="Phone, email, or address"
           />
           <TextField
-            label="Accountant's Name"
+            label="Your accountant's name"
             name="accountantName"
             value={data.accountantName}
             onChange={handleChange}
             onBlur={handleBlur}
           />
           <TextField
-            label="Accountant's Contact"
+            label="Their contact info"
             name="accountantContact"
             value={data.accountantContact}
             onChange={handleChange}
@@ -100,14 +100,14 @@ export default function ImportantContacts({
             placeholder="Phone, email, or address"
           />
           <TextField
-            label="Financial Advisor's Name"
+            label="Your financial advisor's name"
             name="financialAdvisorName"
             value={data.financialAdvisorName}
             onChange={handleChange}
             onBlur={handleBlur}
           />
           <TextField
-            label="Financial Advisor's Contact"
+            label="Their contact info"
             name="financialAdvisorContact"
             value={data.financialAdvisorContact}
             onChange={handleChange}
@@ -272,14 +272,14 @@ export default function ImportantContacts({
         <h3 className="text-sage-700 mb-4">Will, Estate & Legal Documents</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextField
-            label="Executor of Will"
+            label="Who's your executor?"
             name="executorOfWill"
             value={data.executorOfWill}
             onChange={handleChange}
             onBlur={handleBlur}
           />
           <TextField
-            label="Location of Will"
+            label="Where's your will kept?"
             name="locationOfWill"
             value={data.locationOfWill}
             onChange={handleChange}
@@ -340,17 +340,16 @@ export default function ImportantContacts({
       {/* Close Friends to Notify */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sage-700">Close Friends to Notify</h3>
+          <h3 className="text-sage-700">Close Friends & Family to Notify</h3>
           <Button onClick={addFriend} variant="outline" size="lg" className="gap-2">
             <Plus className="h-5 w-5" aria-hidden="true" />
-            Add Friend
+            + Add another friend
           </Button>
         </div>
 
         {data.closeFriends.length === 0 && (
           <p className="text-muted-foreground text-center py-6 bg-muted/30 rounded-lg text-base">
-            No friends added. Click &ldquo;Add Friend&rdquo; to list close friends who
-            should be notified.
+            Who should your family call? Add close friends and family members here.
           </p>
         )}
 

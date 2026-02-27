@@ -104,7 +104,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
       {/* Credit Cards */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sage-700">Credit Cards</h3>
+          <h3 className="text-sage-700">Your Credit Cards</h3>
           <Button
             onClick={addCard}
             variant="outline"
@@ -112,14 +112,13 @@ export default function Debts({ data, onChange }: DebtsProps) {
             className="gap-2"
           >
             <Plus className="h-5 w-5" aria-hidden="true" />
-            Add Credit Card
+            + Add another card
           </Button>
         </div>
 
         {data.creditCards.length === 0 && (
-          <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-            No credit cards added yet. Click &ldquo;Add Credit Card&rdquo; to
-            get started.
+          <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+            No credit cards to list? That&apos;s great!
           </p>
         )}
 
@@ -144,7 +143,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextField
-                    label="Issuer"
+                    label="Who's the card with?"
                     name="issuer"
                     value={card.issuer}
                     onChange={(_, v) => updateCard(index, "issuer", v)}
@@ -161,7 +160,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
                     placeholder="(XXX) XXX-XXXX"
                   />
                   <TextField
-                    label="Card Number"
+                    label="Card number (last 4 is fine)"
                     name="cardNumber"
                     value={card.cardNumber}
                     onChange={(_, v) => updateCard(index, "cardNumber", v)}
@@ -192,7 +191,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
                     onBlur={save}
                   />
                   <CurrencyField
-                    label="Balance Owing"
+                    label="How much do you still owe?"
                     name="balanceOwing"
                     value={card.balanceOwing}
                     onChange={(_, v) => updateCard(index, "balanceOwing", v)}
@@ -214,7 +213,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
       {/* Lines of Credit */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sage-700">Lines of Credit</h3>
+          <h3 className="text-sage-700">Your Lines of Credit</h3>
           <Button
             onClick={addLoc}
             variant="outline"
@@ -222,14 +221,13 @@ export default function Debts({ data, onChange }: DebtsProps) {
             className="gap-2"
           >
             <Plus className="h-5 w-5" aria-hidden="true" />
-            Add Line of Credit
+            + Add another line of credit
           </Button>
         </div>
 
         {data.linesOfCredit.length === 0 && (
-          <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-            No lines of credit added yet. Click &ldquo;Add Line of Credit&rdquo;
-            to get started.
+          <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+            No lines of credit? No problem &mdash; skip ahead if this doesn&apos;t apply.
           </p>
         )}
 
@@ -254,7 +252,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextField
-                    label="Lender"
+                    label="Who's the lender?"
                     name="lender"
                     value={loc.lender}
                     onChange={(_, v) => updateLoc(index, "lender", v)}
@@ -269,7 +267,7 @@ export default function Debts({ data, onChange }: DebtsProps) {
                     onBlur={save}
                   />
                   <CurrencyField
-                    label="Balance"
+                    label="How much do you owe?"
                     name="balance"
                     value={loc.balance}
                     onChange={(_, v) => updateLoc(index, "balance", v)}

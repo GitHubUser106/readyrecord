@@ -71,13 +71,13 @@ export default function RealEstate({ data, onChange }: RealEstateProps) {
         <h3 className="text-sage-700">Properties</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Property
+          + Add another property
         </Button>
       </div>
 
       {data.properties.length === 0 && (
-        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-          No properties added yet. Click &ldquo;Add Property&rdquo; to get started.
+        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+          No properties to list? That&apos;s fine &mdash; just skip ahead.
         </p>
       )}
 
@@ -102,7 +102,7 @@ export default function RealEstate({ data, onChange }: RealEstateProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Property Name / Description"
+                  label="What's this property?"
                   name="propertyName"
                   value={prop.propertyName}
                   onChange={(_, v) => update(index, "propertyName", v)}
@@ -110,14 +110,14 @@ export default function RealEstate({ data, onChange }: RealEstateProps) {
                   placeholder="e.g., Family Home, Lake Cottage"
                 />
                 <TextField
-                  label="Address"
+                  label="Where is it?"
                   name="address"
                   value={prop.address}
                   onChange={(_, v) => update(index, "address", v)}
                   onBlur={save}
                 />
                 <TextField
-                  label="Purchase Date"
+                  label="When did you buy it?"
                   name="purchaseDate"
                   value={prop.purchaseDate}
                   onChange={(_, v) => update(index, "purchaseDate", v)}
@@ -132,7 +132,7 @@ export default function RealEstate({ data, onChange }: RealEstateProps) {
                   onBlur={save}
                 />
                 <TextField
-                  label="Mortgage Lender"
+                  label="Who holds the mortgage?"
                   name="mortgageLender"
                   value={prop.mortgageLender}
                   onChange={(_, v) => update(index, "mortgageLender", v)}
@@ -146,14 +146,14 @@ export default function RealEstate({ data, onChange }: RealEstateProps) {
                   onBlur={save}
                 />
                 <CurrencyField
-                  label="Mortgage Balance"
+                  label="How much is left on the mortgage?"
                   name="mortgageBalance"
                   value={prop.mortgageBalance}
                   onChange={(_, v) => update(index, "mortgageBalance", v)}
                   onBlur={save}
                 />
                 <CurrencyField
-                  label="Approximate Current Value"
+                  label="Roughly what's it worth?"
                   name="approximateValue"
                   value={prop.approximateValue}
                   onChange={(_, v) => update(index, "approximateValue", v)}

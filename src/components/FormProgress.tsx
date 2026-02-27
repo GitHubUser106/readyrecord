@@ -38,8 +38,8 @@ export default function FormProgress({
                   aria-current={isCurrent ? "step" : undefined}
                   aria-label={`${section.title}${isComplete ? " (complete)" : ""}`}
                 >
-                  {isComplete && <Check className="h-4 w-4" aria-hidden="true" />}
-                  <span>{index + 1}. {section.title}</span>
+                  {isComplete && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+                  <span>{section.title}</span>
                 </button>
               </li>
             );
@@ -47,42 +47,40 @@ export default function FormProgress({
         </ol>
       </div>
 
-      {/* Desktop: vertical sidebar list */}
+      {/* Desktop: vertical sidebar list with dots */}
       <div className="hidden md:block max-h-[calc(100vh-12rem)] overflow-y-auto">
-        <ol className="space-y-1">
+        <ol className="space-y-0.5">
           {SECTIONS.map((section, index) => {
             const isComplete = completions[section.id] === 100;
             const isCurrent = index === currentSection;
-            const completion = completions[section.id];
             return (
               <li key={section.id}>
                 <button
                   onClick={() => onSectionClick(index)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors",
+                    "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-colors",
                     isCurrent
-                      ? "bg-primary/10 text-primary font-semibold border-l-4 border-primary"
+                      ? "bg-sage-50 text-sage-800 font-semibold"
                       : isComplete
-                        ? "text-sage-700 hover:bg-sage-50"
-                        : "text-muted-foreground hover:bg-muted/50"
+                        ? "text-sage-700 hover:bg-sage-50/60"
+                        : "text-muted-foreground hover:bg-muted/40"
                   )}
                   aria-current={isCurrent ? "step" : undefined}
-                  aria-label={`${section.title}${isComplete ? " (complete)" : completion > 0 ? ` (${completion}% complete)` : ""}`}
+                  aria-label={`${section.title}${isComplete ? " (complete)" : ""}`}
                 >
+                  {/* Dot indicator */}
                   <span
                     className={cn(
-                      "flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0",
+                      "flex items-center justify-center w-3 h-3 rounded-full shrink-0 transition-all",
                       isCurrent
-                        ? "bg-primary text-primary-foreground"
+                        ? "bg-sage-500 ring-2 ring-sage-300 ring-offset-2"
                         : isComplete
-                          ? "bg-sage-500 text-white"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-sage-500"
+                          : "border-2 border-muted-foreground/40 bg-transparent"
                     )}
                   >
-                    {isComplete ? (
-                      <Check className="h-4 w-4" aria-hidden="true" />
-                    ) : (
-                      index + 1
+                    {isComplete && !isCurrent && (
+                      <Check className="h-2 w-2 text-white" strokeWidth={4} aria-hidden="true" />
                     )}
                   </span>
                   <span className="text-base">{section.title}</span>

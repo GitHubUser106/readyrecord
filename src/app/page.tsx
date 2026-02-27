@@ -23,7 +23,7 @@ export default function LandingPage() {
             </p>
             <Link href="/form">
               <Button size="lg" className="text-xl px-10 py-7 rounded-xl shadow-lg">
-                Start Now — No Account Needed
+                Let&apos;s Get Started
               </Button>
             </Link>
             <p className="mt-4 text-base text-muted-foreground">
@@ -146,18 +146,18 @@ export default function LandingPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                "Personal identification & SIN numbers",
-                "Important contacts & close friends",
-                "Bank accounts & investments",
-                "Pensions & income sources (CPP, OAS)",
-                "Credit cards & lines of credit",
-                "Real estate & mortgages",
-                "Physical assets & valuables",
-                "Business interests & partnerships",
-                "Insurance policies (auto, home, life, health)",
-                "Monthly bills & expenses",
-                "Digital accounts & subscriptions",
-                "Step-by-step action guide for your family",
+                "About you — your name, SIN, and ID",
+                "Your people — lawyers, accountants, close friends",
+                "Your accounts — banks and investments",
+                "Your income — pensions, CPP, OAS, and more",
+                "What you owe — credit cards and loans",
+                "Your properties — homes and real estate",
+                "Your valuables — vehicles, jewelry, heirlooms",
+                "Your businesses — if you own one",
+                "Your insurance — auto, home, life, health",
+                "Your monthly bills — utilities, subscriptions",
+                "Your online accounts — email, social media, streaming",
+                "A step-by-step action guide for your family",
               ].map((item) => (
                 <div
                   key={item}

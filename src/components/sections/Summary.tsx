@@ -1,8 +1,6 @@
 "use client";
 
-import type { ReadyRecordData, SectionId } from "@/lib/types";
-import { SECTIONS } from "@/lib/types";
-import { getSectionCompletion, getOverallCompletion } from "@/lib/storage";
+import type { ReadyRecordData } from "@/lib/types";
 import {
   formatCurrency,
   totalBankBalances,
@@ -21,15 +19,62 @@ import {
   totalDigitalSubscriptionsCost,
 } from "@/lib/calculations";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, AlertCircle } from "lucide-react";
+import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { saveAllData } from "@/lib/storage";
+import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
 
 interface SummaryProps {
   data: ReadyRecordData;
 }
 
+function buildNarrative(data: ReadyRecordData): string {
+  const parts: string[] = [];
+
+  const bankCount = data.bankAccounts.accounts.length;
+  if (bankCount > 0) parts.push(`${bankCount} bank account${bankCount > 1 ? "s" : ""}`);
+
+  const propCount = data.realEstate.properties.length;
+  if (propCount > 0) parts.push(`${propCount} propert${propCount > 1 ? "ies" : "y"}`);
+
+  const policyCount = Object.values(data.insurance).reduce(
+    (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
+    0
+  );
+  if (policyCount > 0) parts.push(`${policyCount} insurance polic${policyCount > 1 ? "ies" : "y"}`);
+
+  const incomeCount = data.income.sources.length;
+  if (incomeCount > 0) parts.push(`${incomeCount} income source${incomeCount > 1 ? "s" : ""}`);
+
+  const expenseFilled = data.expenses.expenses.filter(
+    (e) => e.companyName.trim() !== "" || e.monthlyAmount.trim() !== ""
+  ).length;
+  if (expenseFilled > 0) parts.push(`${expenseFilled} monthly bill${expenseFilled > 1 ? "s" : ""}`);
+
+  const assetCount = data.physicalAssets.assets.length;
+  if (assetCount > 0) parts.push(`${assetCount} valuable item${assetCount > 1 ? "s" : ""}`);
+
+  const digitalCount = data.digitalAccounts.accounts.length;
+  if (digitalCount > 0) parts.push(`${digitalCount} online account${digitalCount > 1 ? "s" : ""}`);
+
+  const contactCount = data.importantContacts.closeFriends.length;
+  if (contactCount > 0) parts.push(`${contactCount} close contact${contactCount > 1 ? "s" : ""}`);
+
+  if (parts.length === 0) {
+    return "You've made a start. Come back anytime to add more details.";
+  }
+
+  if (parts.length === 1) {
+    return `You've documented ${parts[0]}. Your family will be grateful.`;
+  }
+
+  const last = parts.pop();
+  return `You've documented ${parts.join(", ")}, and ${last}. Your family will be so grateful you did this.`;
+}
+
 export default function Summary({ data }: SummaryProps) {
-  const completions = getSectionCompletion(data);
-  const overall = getOverallCompletion(data);
+  const router = useRouter();
 
   const _totalAssets = totalAssets(data);
   const _totalDebts = totalDebts(data);
@@ -39,62 +84,20 @@ export default function Summary({ data }: SummaryProps) {
   const _monthlyNet = monthlyNet(data);
   const _autoPaymentCosts = totalAutoPaymentExpenses(data);
 
-  const accountCount =
-    data.bankAccounts.accounts.length +
-    data.debts.creditCards.length +
-    data.debts.linesOfCredit.length;
-
-  const policyCount = Object.values(data.insurance).reduce(
-    (sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0),
-    0
-  );
+  const narrative = buildNarrative(data);
 
   return (
     <div className="space-y-8">
-      {/* Overall progress */}
-      <Card>
-        <CardContent className="pt-6">
-          <h3 className="text-sage-700 mb-4">Completion Progress</h3>
-          <div className="mb-4">
-            <div className="flex justify-between mb-2">
-              <span className="font-semibold text-lg">Overall: {overall}%</span>
-            </div>
-            <div className="w-full h-4 bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-500"
-                style={{ width: `${overall}%` }}
-                role="progressbar"
-                aria-valuenow={overall}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Overall completion: ${overall}%`}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {SECTIONS.filter((s) => s.id !== "summary" && s.id !== "action-guide").map((section) => {
-              const pct = completions[section.id as SectionId];
-              const isComplete = pct === 100;
-              return (
-                <div
-                  key={section.id}
-                  className="flex items-center gap-2 text-base"
-                >
-                  {isComplete ? (
-                    <Check className="h-5 w-5 text-sage-500 shrink-0" aria-hidden="true" />
-                  ) : (
-                    <AlertCircle className="h-5 w-5 text-muted-foreground shrink-0" aria-hidden="true" />
-                  )}
-                  <span className={isComplete ? "text-sage-700" : "text-muted-foreground"}>
-                    {section.title}
-                  </span>
-                  <span className="ml-auto font-mono text-sm">{pct}%</span>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Warm congratulations */}
+      <div className="text-center py-6">
+        <Heart className="h-10 w-10 text-sage-500 mx-auto mb-4" aria-hidden="true" />
+        <h3 className="text-sage-700 text-2xl mb-3">
+          You did it!
+        </h3>
+        <p className="text-muted-foreground text-lg max-w-lg mx-auto leading-relaxed">
+          {narrative}
+        </p>
+      </div>
 
       {/* Financial Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -110,7 +113,7 @@ export default function Summary({ data }: SummaryProps) {
               </div>
               <div className="flex justify-between text-lg">
                 <span>Monthly Expenses</span>
-                <span className="font-semibold text-destructive">
+                <span className="font-semibold">
                   {formatCurrency(_monthlyExpenses)}
                 </span>
               </div>
@@ -120,7 +123,7 @@ export default function Summary({ data }: SummaryProps) {
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-xl font-bold">
                 <span>Monthly Net</span>
-                <span className={_monthlyNet >= 0 ? "text-sage-700" : "text-destructive"}>
+                <span className={_monthlyNet >= 0 ? "text-sage-700" : "text-muted-foreground"}>
                   {formatCurrency(_monthlyNet)}
                 </span>
               </div>
@@ -171,14 +174,14 @@ export default function Summary({ data }: SummaryProps) {
                 </div>
                 <div className="flex justify-between text-lg">
                   <span>Total Debts</span>
-                  <span className="font-semibold text-destructive">
+                  <span className="font-semibold">
                     {formatCurrency(_totalDebts)}
                   </span>
                 </div>
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-xl font-bold">
                 <span>Net Worth</span>
-                <span className={_netWorth >= 0 ? "text-sage-700" : "text-destructive"}>
+                <span className={_netWorth >= 0 ? "text-sage-700" : "text-muted-foreground"}>
                   {formatCurrency(_netWorth)}
                 </span>
               </div>
@@ -196,79 +199,30 @@ export default function Summary({ data }: SummaryProps) {
               Total of pre-authorized expenses and auto-payment digital subscriptions
               that your family will need to cancel or transfer.
             </p>
-            <div className="text-2xl font-bold text-destructive">
+            <div className="text-2xl font-bold text-sage-700">
               {formatCurrency(_autoPaymentCosts)} / month
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Quick stats */}
-      <Card>
-        <CardContent className="pt-6">
-          <h3 className="text-sage-700 mb-4">At a Glance</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">{accountCount}</div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Financial Accounts
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">{policyCount}</div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Insurance Policies
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.income.sources.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Income Sources
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.realEstate.properties.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">Properties</div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.physicalAssets.assets.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Physical Assets
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.businessInterests.businesses.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Businesses
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.digitalAccounts.accounts.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Digital Accounts
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-3xl font-bold text-primary">
-                {data.importantContacts.closeFriends.length}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Contacts Listed
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Download CTA */}
+      <div className="text-center py-6">
+        <Button
+          onClick={() => {
+            saveAllData(data);
+            router.push("/review");
+          }}
+          size="lg"
+          className="text-xl px-10 py-7 rounded-xl shadow-lg gap-2"
+        >
+          <FileDown className="h-6 w-6" aria-hidden="true" />
+          Download Your ReadyRecord
+        </Button>
+        <p className="text-muted-foreground mt-4 text-base">
+          Want to add more? You can come back anytime.
+        </p>
+      </div>
     </div>
   );
 }

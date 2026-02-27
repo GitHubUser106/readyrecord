@@ -86,17 +86,16 @@ export default function BusinessInterests({ data, onChange }: BusinessInterestsP
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sage-700">Business Interests</h3>
+        <h3 className="text-sage-700">Your Businesses</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Business
+          + Add another business
         </Button>
       </div>
 
       {data.businesses.length === 0 && (
         <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
-          No businesses listed. Click &ldquo;Add Business&rdquo; if you own or have a stake
-          in any business.
+          No businesses? No problem &mdash; most people skip this one.
         </p>
       )}
 
@@ -120,7 +119,7 @@ export default function BusinessInterests({ data, onChange }: BusinessInterestsP
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Business Name"
+                  label="What's the business called?"
                   name="businessName"
                   value={biz.businessName}
                   onChange={(_, v) => update(index, "businessName", v)}
@@ -168,7 +167,7 @@ export default function BusinessInterests({ data, onChange }: BusinessInterestsP
                   placeholder="If applicable"
                 />
                 <TextField
-                  label="Partner(s) / Co-Owner(s)"
+                  label="Who else is involved?"
                   name="partners"
                   value={biz.partners}
                   onChange={(_, v) => update(index, "partners", v)}

@@ -74,21 +74,20 @@ export default function Expenses({ data, onChange }: ExpensesProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sage-700">Monthly Expenses & Bills</h3>
+        <h3 className="text-sage-700">Your Monthly Bills</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Expense
+          + Add another bill
         </Button>
       </div>
 
       <p className="text-muted-foreground text-base">
-        We&rsquo;ve pre-filled some common expenses to get you started. Feel
-        free to edit, remove, or add your own.
+        We&apos;ve started a list of common bills to get you going. Edit, remove, or add your own.
       </p>
 
       {data.expenses.length === 0 && (
-        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg">
-          No expenses listed. Click &ldquo;Add Expense&rdquo; to get started.
+        <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
+          No bills listed yet &mdash; add your monthly expenses here.
         </p>
       )}
 
@@ -113,7 +112,7 @@ export default function Expenses({ data, onChange }: ExpensesProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="What It's For"
+                  label="What's this bill for?"
                   name="description"
                   value={expense.description}
                   onChange={(_, v) => update(index, "description", v)}
@@ -121,7 +120,7 @@ export default function Expenses({ data, onChange }: ExpensesProps) {
                   placeholder="e.g., Telephone, Internet, Hydro"
                 />
                 <TextField
-                  label="Company Name"
+                  label="Who do you pay?"
                   name="companyName"
                   value={expense.companyName}
                   onChange={(_, v) => update(index, "companyName", v)}
@@ -161,7 +160,7 @@ export default function Expenses({ data, onChange }: ExpensesProps) {
                   onBlur={save}
                 />
                 <CurrencyField
-                  label="Monthly Amount"
+                  label="How much per month?"
                   name="monthlyAmount"
                   value={expense.monthlyAmount}
                   onChange={(_, v) => update(index, "monthlyAmount", v)}

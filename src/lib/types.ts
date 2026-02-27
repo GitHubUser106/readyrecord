@@ -268,6 +268,7 @@ export interface SectionMeta {
   title: string;
   description: string;
   icon: string;
+  encouragement?: string;
 }
 
 export type SectionId =
@@ -282,99 +283,102 @@ export type SectionId =
   | "insurance"
   | "expenses"
   | "digital-accounts"
-  | "summary"
-  | "action-guide";
+  | "summary";
 
 export const SECTIONS: SectionMeta[] = [
   {
     id: "personal-info",
-    title: "Personal Information",
+    title: "About You",
     description:
-      "Let's start with the basics — just pull out your wallet and any ID you have handy.",
+      "Let\u2019s start with the basics \u2014 just pull out your wallet and any ID you have handy.",
     icon: "User",
   },
   {
     id: "important-contacts",
-    title: "Important Contacts & Advisors",
+    title: "Your People",
     description:
-      "Your lawyer, accountant, family contacts, and important details your family will need first.",
+      "Who should your family call first? Your lawyer, accountant, close friends \u2014 anyone who\u2019d want to know.",
     icon: "BookOpen",
+    encouragement: "Great start \u2014 the basics are done.",
   },
   {
     id: "bank-accounts",
-    title: "Bank Accounts & Investments",
+    title: "Your Accounts",
     description:
-      "Your bank accounts, RRSPs, TFSAs, and any investments. Check your latest statements if you have them.",
+      "Let\u2019s note down your bank accounts and investments. If you have statements handy, great \u2014 but even just the bank names and rough balances are helpful.",
     icon: "Landmark",
+    encouragement: "Your contacts are saved. Nice work.",
   },
   {
     id: "income",
-    title: "Income Sources",
+    title: "Your Income",
     description:
-      "Pensions, CPP, OAS, rental income — everything that comes in each month.",
+      "Pensions, CPP, OAS, rental income \u2014 everything that comes in each month. Your family will need to know what to expect.",
     icon: "DollarSign",
+    encouragement: "That\u2019s your accounts done. You\u2019re doing great.",
   },
   {
     id: "debts",
-    title: "Debts",
+    title: "What You Owe",
     description:
-      "Credit cards, lines of credit — anything your family should know about. No judgement here.",
+      "Nobody loves this part, but it helps your family know what needs to be paid off. Just the cards and loans you can think of \u2014 it doesn\u2019t need to be exact.",
     icon: "CreditCard",
+    encouragement: "Income section complete. Keep going!",
   },
   {
     id: "real-estate",
-    title: "Real Estate",
+    title: "Your Properties",
     description:
-      "Any properties you own — your home, cottage, rental properties. Gather your mortgage papers if you can.",
+      "Any properties you own \u2014 your home, cottage, rental properties. Grab your mortgage papers if you can find them.",
     icon: "Home",
+    encouragement: "Almost halfway \u2014 you\u2019re making great progress.",
   },
   {
     id: "physical-assets",
-    title: "Physical Assets & Valuables",
+    title: "Your Valuables",
     description:
-      "Vehicles, jewelry, collectibles, firearms — anything of value your family should know about.",
+      "Things like vehicles, jewelry, collections, or anything your family should know about. Also a good place to note who you\u2019d like certain things to go to.",
     icon: "Package",
+    encouragement: "Properties are noted. Well done.",
   },
   {
     id: "business-interests",
-    title: "Business Interests",
+    title: "Your Businesses",
     description:
-      "Any businesses you own or have a stake in — corporations, partnerships, or sole proprietorships.",
+      "If you own or co-own a business of any kind, your family will need to know who to contact. If this doesn\u2019t apply, just skip ahead.",
     icon: "Briefcase",
+    encouragement: "Your valuables are recorded. Nearly there.",
   },
   {
     id: "insurance",
-    title: "Insurance Plans",
+    title: "Your Insurance",
     description:
-      "Car insurance, home insurance, life insurance, health plans — all in one place.",
+      "Car insurance, home insurance, life insurance, health plans \u2014 all the policies that keep you and your family covered.",
     icon: "Shield",
+    encouragement: "Businesses done. Just a few more to go.",
   },
   {
     id: "expenses",
-    title: "Monthly Expenses & Bills",
+    title: "Your Monthly Bills",
     description:
-      "Your regular monthly bills. We've pre-filled some common ones to get you started.",
+      "Your regular monthly bills. We\u2019ve started a list of common ones \u2014 just fill in what applies to you.",
     icon: "Receipt",
+    encouragement: "Insurance is sorted. Almost finished!",
   },
   {
     id: "digital-accounts",
-    title: "Digital Accounts & Subscriptions",
+    title: "Your Online Accounts",
     description:
-      "Email, social media, streaming, online banking — accounts your family may need to manage.",
+      "Email, social media, streaming, online banking \u2014 accounts your family may need to manage or cancel.",
     icon: "Globe",
+    encouragement: "Bills are covered. Just one more section after this.",
   },
   {
     id: "summary",
-    title: "Summary",
+    title: "Your Summary",
     description:
-      "A complete overview of everything you've entered. You're almost done!",
+      "Here\u2019s everything you\u2019ve put together. Your family will be so grateful you did this.",
     icon: "BarChart3",
-  },
-  {
-    id: "action-guide",
-    title: "What To Do — Action Guide",
-    description:
-      "A step-by-step guide for your family, with timelines, template letters, and important phone numbers.",
-    icon: "ClipboardList",
+    encouragement: "That\u2019s everything! Let\u2019s see what you\u2019ve put together.",
   },
 ];

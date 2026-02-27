@@ -85,17 +85,16 @@ export default function PhysicalAssets({ data, onChange }: PhysicalAssetsProps) 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sage-700">Physical Assets & Valuables</h3>
+        <h3 className="text-sage-700">Your Valuables</h3>
         <Button onClick={add} variant="outline" size="lg" className="gap-2">
           <Plus className="h-5 w-5" aria-hidden="true" />
-          Add Item
+          + Add another item
         </Button>
       </div>
 
       {data.assets.length === 0 && (
         <p className="text-muted-foreground text-center py-8 bg-muted/30 rounded-lg text-base">
-          No items listed. Click &ldquo;Add Item&rdquo; to document vehicles, jewelry,
-          collectibles, or other valuables.
+          Nothing to list here? That&apos;s okay &mdash; add vehicles, jewelry, or other valuables when you&apos;re ready.
         </p>
       )}
 
@@ -119,7 +118,7 @@ export default function PhysicalAssets({ data, onChange }: PhysicalAssetsProps) 
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextField
-                  label="Item Description"
+                  label="What is it?"
                   name="description"
                   value={asset.description}
                   onChange={(_, v) => update(index, "description", v)}
@@ -136,7 +135,7 @@ export default function PhysicalAssets({ data, onChange }: PhysicalAssetsProps) 
                   placeholder="Select category..."
                 />
                 <TextField
-                  label="Location"
+                  label="Where is it kept?"
                   name="location"
                   value={asset.location}
                   onChange={(_, v) => update(index, "location", v)}
@@ -144,14 +143,14 @@ export default function PhysicalAssets({ data, onChange }: PhysicalAssetsProps) 
                   placeholder="e.g., Home garage, safety deposit box"
                 />
                 <CurrencyField
-                  label="Approximate Value"
+                  label="Roughly what's it worth?"
                   name="approximateValue"
                   value={asset.approximateValue}
                   onChange={(_, v) => update(index, "approximateValue", v)}
                   onBlur={save}
                 />
                 <TextField
-                  label="Intended Recipient"
+                  label="Who should get this?"
                   name="intendedRecipient"
                   value={asset.intendedRecipient}
                   onChange={(_, v) => update(index, "intendedRecipient", v)}
@@ -159,7 +158,7 @@ export default function PhysicalAssets({ data, onChange }: PhysicalAssetsProps) 
                   placeholder="Who should receive this?"
                 />
                 <TextField
-                  label="Photo Reference"
+                  label="Where's a photo of it?"
                   name="photoReference"
                   value={asset.photoReference}
                   onChange={(_, v) => update(index, "photoReference", v)}

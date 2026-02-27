@@ -55,10 +55,10 @@ export default function ReviewPage() {
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
             Back to Form
           </Link>
-          <h1>Review & Download</h1>
+          <h1>Your ReadyRecord</h1>
           <p className="text-xl text-muted-foreground mt-2">
-            Here&apos;s a summary of everything you&apos;ve entered. When
-            you&apos;re ready, download your PDF.
+            Here&apos;s everything you&apos;ve put together. When you&apos;re
+            ready, download your PDF to keep somewhere safe.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export default function ReviewPage() {
             disabled={generating}
           >
             <FileDown className="h-6 w-6" aria-hidden="true" />
-            {generating ? "Generating..." : "Download PDF"}
+            {generating ? "Generating..." : "Download Your ReadyRecord"}
           </Button>
           <Button
             onClick={handleDownloadPDF}
@@ -82,7 +82,7 @@ export default function ReviewPage() {
             disabled={generating}
           >
             <Lock className="h-6 w-6" aria-hidden="true" />
-            {generating ? "Generating..." : "Download Encrypted PDF"}
+            {generating ? "Generating..." : "Download Encrypted Version"}
           </Button>
         </div>
 
